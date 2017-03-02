@@ -46,9 +46,5 @@
     layoutMode: "Compact"
   pigments:
     markerType: "dot"
-  "sync-settings":
-    _lastBackupHash: "0c1efab7515a95640dd65d3ce470105d69296aa5"
-    gistId: "63ff0d8c3f26fc8923f2bf25e2560303"
-    personalAccessToken: "c009b4eb56c096b4b95d535797808a2ccf40fab9"
   welcome:
     showOnStartup: false
