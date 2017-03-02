@@ -1,0 +1,17 @@
+[user]
+  name = Jon Milner
+  email = email@jonmilner.com
+[github]
+  user = jonmilner
+[core]
+  editor = "atom --wait"
+  attributesfile = ~/.gitattributes
+  excludesfile = ~/.gitignore
+[alias]
+  # Todo
+[pager]
+  # Insanely beautiful diffs ==> npm install -g diff-so-fancy
+  diff = diff-so-fancy | less --tabs=4 -RFX
+  show = diff-so-fancy | less --tabs=4 -RFX
+[pull]
+  rebase = true

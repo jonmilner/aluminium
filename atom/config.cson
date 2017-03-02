@@ -1,0 +1,54 @@
+"*":
+  "atom-beautify":
+    general:
+      _analyticsUserId: "f0108c3b-e4b9-4ef8-9ab2-44330caa359d"
+  core:
+    closeEmptyWindows: false
+    disabledPackages: [
+      "imdone-atom"
+      "language-slim"
+      "language-haml"
+      "simple-drag-drop-text"
+      "background-tips"
+      "whitespace"
+      "archive-view"
+      "about"
+      "autoflow"
+      "bookmarks"
+      "welcome"
+      "atom-typescript"
+      "atom-jade"
+      "atom-beautify"
+      "language-pug"
+      "minimap-highlight-selected"
+      "symbols-view"
+    ]
+    telemetryConsent: "no"
+  editor:
+    autoIndentOnPaste: false
+    fontFamily: "Operator Mono"
+    fontSize: 16
+    showIndentGuide: true
+    showInvisibles: true
+    tabType: "soft"
+  "exception-reporting":
+    userId: "anonymousId"
+  "file-icons":
+    forceShow: true
+    onChanges: true
+  linter:
+    lintOnFlyInterval: 1500
+  minimap:
+    plugins:
+      "highlight-selected": true
+      "highlight-selectedDecorationsZIndex": 0
+  "one-dark-ui":
+    layoutMode: "Compact"
+  pigments:
+    markerType: "dot"
+  "sync-settings":
+    _lastBackupHash: "0c1efab7515a95640dd65d3ce470105d69296aa5"
+    gistId: "63ff0d8c3f26fc8923f2bf25e2560303"
+    personalAccessToken: "c009b4eb56c096b4b95d535797808a2ccf40fab9"
+  welcome:
+    showOnStartup: false
