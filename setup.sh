@@ -34,7 +34,7 @@ create_symlink $DOTFILES_DIR/git/gitconfig ~/.gitconfig
 create_symlink $DOTFILES_DIR/git/gitignore ~/.gitignore
 
 # Hyper
-create_symlink $DOTFILES_DIR/hyper.js ~/.hyper.js
+create_symlink $DOTFILES_DIR/hyper/hyper.js ~/.hyper.js
 
 # zsh
 create_symlink $DOTFILES_DIR/zsh/zshrc ~/.zshrc
