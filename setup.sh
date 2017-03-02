@@ -14,11 +14,6 @@ done
 SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd -P)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
 
-# Pull latest files from GitHub
-cd $DOTFILES_DIR
-git submodule update --init --recursive # init git submodules
-git submodule foreach git pull origin master # pull latest versions of vendor submodules
-
 # Symlink and report creation of link
 create_symlink() {
   ln -sfn $1 $2

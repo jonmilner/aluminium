@@ -1,3 +1,0 @@
-[submodule "zsh/vendor/pure"]
-  path = zsh/vendor/pure
-  url = git@github.com:sindresorhus/pure.git
