@@ -55,7 +55,7 @@ defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 #  12: Notification Center
 
 # top left screen corner — Mission Control
-defaults write com.apple.dock wvous-tl-corner -int 3
+defaults write com.apple.dock wvous-tl-corner -int 2
 defaults write com.apple.dock wvous-tl-modifier -int 0
 
 # top right screen corner — None
