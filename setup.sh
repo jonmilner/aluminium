@@ -16,15 +16,15 @@ done
 
 # Atom
 ln -s /Applications/Atom.app/Contents/Resources/app/atom.sh /usr/local/bin/atom
-create_symlink dotfiles/atom/ ~/.atom
+ln -s dotfiles/atom/ ~/.atom
 
 # Git
-create_symlink dotfiles/git/gitattributes ~/.gitattributes
-create_symlink dotfiles/git/gitconfig ~/.gitconfig
-create_symlink dotfiles/git/gitignore ~/.gitignore
+ln -s dotfiles/git/gitattributes ~/.gitattributes
+ln -s dotfiles/git/gitconfig ~/.gitconfig
+ln -s dotfiles/git/gitignore ~/.gitignore
 
 # Hyper
-create_symlink dotfiles/hyper/hyper.js ~/.hyper.js
+ln -s dotfiles/hyper/hyper.js ~/.hyper.js
 
 # zsh
-create_symlink dotfiles/zsh/zshrc ~/.zshrc
+ln -s dotfiles/zsh/zshrc ~/.zshrc
