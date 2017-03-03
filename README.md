@@ -6,25 +6,25 @@
 ## Install
 
 ### XCode Command Line Tools
-`sh install/xcode.sh`
+`$ sh dotfiles/install/xcode.sh`
 
 ### ZSH
-`sh install/zsh.sh`
+`$ sh dotfiles/install/zsh.sh`
 
 ### Homebrew
-`sh install/brew.sh`
+`$ sh dotfiles/install/brew.sh`
 
 ### Install Applications (with Caskroom)
-`sh install/brew-cask.sh`
+`$ sh dotfiles/install/brew-cask.sh`
 
 ### Node
-`sh install/npm.sh`
+`$ sh dotfiles/install/npm.sh`
 
 ### OSX defaults
-`sh macos/set-defaults.sh`
+`$ sh dotfiles/macos/set-defaults.sh`
 
 ### Symlinks
-`sh setup.sh`
+`$ sh dotfiles/setup.sh`
 
 ## Other Stuff
 
