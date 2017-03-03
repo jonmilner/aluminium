@@ -10,31 +10,21 @@ while true; do
   esac
 done
 
-# Get the dotfiles directory's absolute path
-SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd -P)"
-DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
-
-# Symlink and report creation of link
-create_symlink() {
-  ln -sfn $1 $2
-  echo "Symlinked ${1} -> ${2}"
-}
-
 ###############################################################################
 # Symlinks
 ###############################################################################
 
 # Atom
 ln -s /Applications/Atom.app/Contents/Resources/app/atom.sh /usr/local/bin/atom
-create_symlink $DOTFILES_DIR/atom/ ~/.atom
+create_symlink dotfiles/atom/ ~/.atom
 
 # Git
-create_symlink $DOTFILES_DIR/git/gitattributes ~/.gitattributes
-create_symlink $DOTFILES_DIR/git/gitconfig ~/.gitconfig
-create_symlink $DOTFILES_DIR/git/gitignore ~/.gitignore
+create_symlink dotfiles/git/gitattributes ~/.gitattributes
+create_symlink dotfiles/git/gitconfig ~/.gitconfig
+create_symlink dotfiles/git/gitignore ~/.gitignore
 
 # Hyper
-create_symlink $DOTFILES_DIR/hyper/hyper.js ~/.hyper.js
+create_symlink dotfiles/hyper/hyper.js ~/.hyper.js
 
 # zsh
-create_symlink $DOTFILES_DIR/zsh/zshrc ~/.zshrc
+create_symlink dotfiles/zsh/zshrc ~/.zshrc
