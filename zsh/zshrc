@@ -19,9 +19,7 @@ prompt pure
 export EDITOR=atom
 
 # History
-HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
+source ~/dotfiles/zsh/history.zsh
 
 # Aliases
 source ~/dotfiles/zsh/aliases.zsh
