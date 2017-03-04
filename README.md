@@ -1,30 +1,33 @@
 # dotfiles
 
+## Install Updates
+`sudo softwareupdate -ia --verbose`
+
 ## Clone
-`$ git clone https://github.com/jonmilner/dotfiles.git ~/dotfiles`
+`git clone https://github.com/jonmilner/dotfiles.git ~/dotfiles`
 
 ## Install
 
-### XCode Command Line Tools
-`$ sh dotfiles/install/xcode.sh`
-
 ### ZSH
-`$ sh dotfiles/install/zsh.sh`
+`sh dotfiles/install/zsh.sh`
+
+### NVM
+`curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash`
 
 ### Homebrew
-`$ sh dotfiles/install/brew.sh`
+`sh dotfiles/install/brew.sh`
 
-### Install Applications (with Caskroom)
-`$ sh dotfiles/install/brew-cask.sh`
+### Install GUI Applications, Plugins & Screen Savers
+`sh dotfiles/install/cask.sh`
 
 ### Node
-`$ sh dotfiles/install/npm.sh`
+`sh dotfiles/install/npm.sh`
 
 ### OSX defaults
-`$ sh dotfiles/macos/set-defaults.sh`
+`sh dotfiles/macos/set-defaults.sh`
 
 ### Symlinks
-`$ sh dotfiles/setup.sh`
+`sh dotfiles/setup.sh`
 
 ## Other Stuff
 
