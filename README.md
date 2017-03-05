@@ -8,17 +8,17 @@
 
 ## Install
 
+### Fix Permissions
+`sudo chown -R "$USER":admin /usr/local`
+
 ### ZSH
 `sh dotfiles/install/zsh.sh`
 
-### NVM
-`curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash`
+#### zsh-syntax-highlighting
+`git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting`
 
 ### Homebrew
 `sh dotfiles/install/brew.sh`
-
-### Install GUI Applications, Plugins & Screen Savers
-`sh dotfiles/install/cask.sh`
 
 ### Node
 `sh dotfiles/install/npm.sh`
@@ -28,8 +28,3 @@
 
 ### Symlinks
 `sh dotfiles/setup.sh`
-
-## Other Stuff
-
-### zsh-syntax-highlighting
-`git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting`

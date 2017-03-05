@@ -18,9 +18,5 @@ fi
 npm config set save-exact = true
 
 # Globally install packages with npm
-packages=(
-  diff-so-fancy
-  pure-prompt
-)
-
-npm install -g "${packages[@]}"
+npm install -g diff-so-fancy
+npm install -g pure-prompt
