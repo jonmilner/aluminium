@@ -25,5 +25,8 @@ ln -sfn dotfiles/git/gitignore ~/.gitignore
 # Hyper
 ln -sfn dotfiles/hyper/hyper.js ~/.hyper.js
 
+# Mackup
+ln -sfn dotfiles/mackup.cfg ~/.mackup.cfg
+
 # zsh
 ln -sfn dotfiles/zsh/zshrc ~/.zshrc
