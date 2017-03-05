@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Warn user this script will overwrite current dotfiles
 while true; do
@@ -15,15 +15,15 @@ done
 ###############################################################################
 
 # Atom
-ln -s /Applications/Atom.app/Contents/Resources/app/atom.sh /usr/local/bin/atom
+ln -sfn /Applications/Atom.app/Contents/Resources/app/atom.sh /usr/local/bin/atom
 
 # Git
-ln -s dotfiles/git/gitattributes ~/.gitattributes
-ln -s dotfiles/git/gitconfig ~/.gitconfig
-ln -s dotfiles/git/gitignore ~/.gitignore
+ln -sfn dotfiles/git/gitattributes ~/.gitattributes
+ln -sfn dotfiles/git/gitconfig ~/.gitconfig
+ln -sfn dotfiles/git/gitignore ~/.gitignore
 
 # Hyper
-ln -s dotfiles/hyper/hyper.js ~/.hyper.js
+ln -sfn dotfiles/hyper/hyper.js ~/.hyper.js
 
 # zsh
-ln -s dotfiles/zsh/zshrc ~/.zshrc
+ln -sfn dotfiles/zsh/zshrc ~/.zshrc
