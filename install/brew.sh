@@ -20,11 +20,7 @@ brew update
 brew upgrade --all
 
 # Install Packages
-# apps=(
-#   ...
-# )
-# 
-# brew install "${apps[@]}"
+brew install mackup
 
 # Remove outdated versions from the cellar
 brew cleanup && brew prune
