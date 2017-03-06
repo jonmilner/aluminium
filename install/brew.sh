@@ -53,7 +53,6 @@ brew cask install --force webpquicklook
 
 # Install Screen Savers
 brew cask install --force aerial
-brew cask install --force ios-lockscreen
 
 # Install Mac App Store apps
 mas install 443987910 # 1Password
