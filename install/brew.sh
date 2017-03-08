@@ -37,6 +37,7 @@ brew cask install --force github-desktop
 brew cask install --force google-chrome
 brew cask install --force handbrake
 brew cask install --force hyper
+brew cask install --force private-internet-access
 brew cask install --force sketch
 brew cask install --force slack
 brew cask install --force spotify
