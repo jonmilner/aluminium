@@ -4,7 +4,7 @@
 echo "Date & Time"
 ###############################################################################
 
-echo "∙ Menu bar clock format"
+echo "∙ Format menu bar clock"
 # "h:mm" Default
 # "HH"   Use a 24-hour clock
 # "a"    Show AM/PM
