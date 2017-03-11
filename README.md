@@ -1,30 +1,55 @@
 # dotfiles
 
-## Install Updates
-`sudo softwareupdate -ia --verbose`
-
 ## Clone
-`git clone https://github.com/jonmilner/dotfiles.git ~/dotfiles`
+```shell
+git clone https://github.com/jonmilner/dotfiles.git ~/dotfiles
+```
 
 ## Install
 
+### Install Updates
+```shell
+sudo softwareupdate -ia --verbose
+```
+
 ### Fix Permissions
-`sudo chown -R "$USER":admin /usr/local`
+```shell
+sudo chown -R "$USER":admin /usr/local
+```
 
 ### ZSH
-`sh dotfiles/install/zsh.sh`
+```shell
+sh dotfiles/install/zsh.sh
+```
 
 #### zsh-syntax-highlighting
-`git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting`
+```shell
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+```
 
 ### Homebrew
-`sh dotfiles/install/brew.sh`
+```shell
+sh dotfiles/install/brew.sh
+```
+
+### NVM
+```shell
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
+```
 
 ### Node
-`sh dotfiles/install/npm.sh`
+```shell
+nvm install stable
+nvm use node
+nvm alias default node
+sh dotfiles/install/npm.sh```
 
 ### OSX defaults
-`sh dotfiles/macos/set-defaults.sh`
+```shell
+sh dotfiles/macos/set-defaults.sh
+```
 
 ### Symlinks
-`sh dotfiles/setup.sh`
+```shell
+sh dotfiles/setup.sh
+```
