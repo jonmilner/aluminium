@@ -53,3 +53,8 @@ sh dotfiles/macos/set-defaults.sh
 ```shell
 sh dotfiles/setup.sh
 ```
+
+## Additional Setup
+
+### Mission Control Mouse Setup
+![Mission Control Mouse Setup](mission-control-mouse-setup.png)
