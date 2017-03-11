@@ -22,11 +22,6 @@ sudo chown -R "$USER":admin /usr/local
 sh dotfiles/install/zsh.sh
 ```
 
-#### zsh-syntax-highlighting
-```shell
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-```
-
 ### Homebrew
 ```shell
 sh dotfiles/install/brew.sh
@@ -53,6 +48,11 @@ sh dotfiles/macos/set-defaults.sh
 ### Symlinks
 ```shell
 sh dotfiles/setup.sh
+```
+
+### zsh-syntax-highlighting
+```shell
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 ```
 
 ## Additional Setup
