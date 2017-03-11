@@ -42,7 +42,8 @@ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | b
 nvm install stable
 nvm use node
 nvm alias default node
-sh dotfiles/install/npm.sh```
+sh dotfiles/install/npm.sh
+```
 
 ### OSX defaults
 ```shell
