@@ -55,6 +55,11 @@ sh dotfiles/setup.sh
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 ```
 
+### Mackup
+```shell
+mackup restore
+```
+
 ## Additional Setup
 
 ### Mission Control Mouse Setup
