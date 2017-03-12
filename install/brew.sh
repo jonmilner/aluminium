@@ -39,6 +39,7 @@ brew cask install --force hyper
 brew cask install --force sketch
 brew cask install --force slack
 brew cask install --force spotify
+brew cask install --force transmission
 brew cask install --force transmit
 
 # Install Quick Look Plugins (https://github.com/sindresorhus/quick-look-plugins)
