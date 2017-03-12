@@ -64,6 +64,3 @@ mackup restore
 
 ### Mission Control Mouse Setup
 ![Mission Control Mouse Setup](mission-control-mouse-setup.png)
-
-## TODO
-- Move mackup to dropbox
