@@ -22,11 +22,6 @@ sudo chown -R "$USER":admin /usr/local
 sh dotfiles/install/zsh.sh
 ```
 
-### Homebrew
-```shell
-sh dotfiles/install/brew.sh
-```
-
 ### NVM
 ```shell
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
@@ -40,9 +35,9 @@ nvm alias default node
 sh dotfiles/install/npm.sh
 ```
 
-### OSX defaults
+### Homebrew
 ```shell
-sh dotfiles/macos/set-defaults.sh
+sh dotfiles/install/brew.sh
 ```
 
 ### Symlinks
@@ -55,7 +50,14 @@ sh dotfiles/setup.sh
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 ```
 
+### OSX defaults
+```shell
+sh dotfiles/macos/set-defaults.sh
+```
+
 ### Mackup
+Once DropBox is set up, use Mackup to restore Application settings.
+
 ```shell
 mackup restore
 ```
