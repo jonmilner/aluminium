@@ -14,6 +14,9 @@ done
 # Symlinks
 ###############################################################################
 
+# Atom
+ln -sfn /Applications/Atom.app/Contents/Resources/app/atom.sh /usr/local/bin/atom
+
 # Git
 ln -sfn dotfiles/git/gitattributes ~/.gitattributes
 ln -sfn dotfiles/git/gitconfig ~/.gitconfig
