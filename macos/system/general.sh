@@ -4,6 +4,9 @@
 echo "General"
 ###############################################################################
 
+echo "∙ Show battery percentage in menu bar"
+defaults write com.apple.menuextra.battery ShowPercent -string "YES"
+
 echo "∙ Use Dark menu bar and Dock"
 defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
 
