@@ -7,10 +7,11 @@
   editor = "atom --wait"
   attributesfile = ~/.gitattributes
   excludesfile = ~/.gitignore
+  quotepath = false
 [alias]
-  # Todo
+  l = log --color --pretty=format:'%C(blue)%an%Creset %C(magenta)%ad%Creset %C(magenta)(%ar)%Creset %C(green)%h%Creset %C(yellow)%D%Creset \n - %s \n' --abbrev-commit --date=short
+  stats = shortlog -sn
 [pager]
-  # Insanely beautiful diffs ==> npm install -g diff-so-fancy
   diff = diff-so-fancy | less --tabs=4 -RFX
   show = diff-so-fancy | less --tabs=4 -RFX
 [pull]
