@@ -42,6 +42,8 @@ brew cask install --force spotify
 brew cask install --force steam
 brew cask install --force transmission
 brew cask install --force transmit
+brew cask install --force virtualbox
+brew cask install --force vlc
 
 # Install Quick Look Plugins (https://github.com/sindresorhus/quick-look-plugins)
 brew cask install --force qlcolorcode
