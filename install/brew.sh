@@ -22,6 +22,7 @@ brew upgrade --all
 # Install Packages
 brew install mackup
 brew install mas
+brew install yarn
 
 # Install Cask
 brew tap caskroom/cask
