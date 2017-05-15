@@ -31,5 +31,8 @@ ln -sfn dotfiles/hyper/hyper.js ~/.hyper.js
 # Mackup
 ln -sfn dotfiles/mackup/mackup.cfg ~/.mackup.cfg
 
+# Tmux
+ln -sfn dotfiles/.tmux.conf ~/.tmux.conf
+
 # zsh
 ln -sfn dotfiles/zsh/zshrc ~/.zshrc
