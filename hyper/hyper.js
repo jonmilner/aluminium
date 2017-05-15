@@ -53,6 +53,7 @@ module.exports = {
       magenta: '#cc00ff',
       cyan: '#00ffff',
       white: '#d0d0d0',
+      gray: '#808080',
       lightBlack: '#808080',
       lightRed: '#ff0000',
       lightGreen: '#33ff00',
