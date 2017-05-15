@@ -12,6 +12,9 @@ plugins=(git zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
+# Include z, yo
+. ~/dotfiles/z.sh
+
 autoload -U promptinit; promptinit
 prompt pure
 
