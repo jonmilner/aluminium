@@ -18,11 +18,14 @@ prompt pure
 # Defaults
 export EDITOR=atom
 
+# Aliases
+source ~/dotfiles/zsh/aliases.zsh
+
 # History
 source ~/dotfiles/zsh/history.zsh
 
-# Aliases
-source ~/dotfiles/zsh/aliases.zsh
+# Private settings
+[ -f ~/dotfiles/zsh/private.zsh ] && source ~/dotfiles/zsh/private.zsh
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
