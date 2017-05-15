@@ -17,6 +17,9 @@ done
 # Atom
 ln -sfn /Applications/Atom.app/Contents/Resources/app/atom.sh /usr/local/bin/atom
 
+# bin
+ln -sfn dotfiles/bin ~/bin
+
 # Git
 ln -sfn dotfiles/git/gitattributes ~/.gitattributes
 ln -sfn dotfiles/git/gitconfig ~/.gitconfig
