@@ -28,6 +28,7 @@ brew install yarn
 brew tap caskroom/cask
 
 # Install GUI Applications
+brew cask install --force adobe-creative-cloud
 brew cask install --force appcleaner
 brew cask install --force atom
 brew cask install --force clipmenu
