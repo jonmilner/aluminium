@@ -20,6 +20,7 @@ brew update
 brew upgrade --all
 
 # Install Packages
+brew install diff-so-fancy
 brew install mackup
 brew install mas
 brew install yarn
