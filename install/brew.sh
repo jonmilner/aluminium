@@ -43,6 +43,7 @@ brew cask install --force sketch
 brew cask install --force slack
 brew cask install --force spotify
 brew cask install --force steam
+brew cask install --force the-unarchiver
 brew cask install --force transmission
 brew cask install --force transmit
 brew cask install --force virtualbox
