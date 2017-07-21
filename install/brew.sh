@@ -32,7 +32,7 @@ brew tap caskroom/cask
 brew cask install --force adobe-creative-cloud
 brew cask install --force appcleaner
 brew cask install --force atom
-brew cask install --force clipmenu
+brew cask install --force clipy
 brew cask install --force dropbox
 brew cask install --force firefox
 brew cask install --force github-desktop
