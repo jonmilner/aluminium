@@ -64,7 +64,9 @@ brew cask install --force aerial
 # Install Mac App Store apps
 mas install 443987910 # 1Password
 mas install 413857545 # Divvy
+mas install 668208984 # GIPHY Capture
 mas install 403388357 # Gitbox
+mas install 731062389 # iFlicks 2
 mas install 409183694 # iWork - Keynote
 mas install 409203825 # iWork - Numbers
 mas install 409201541 # iWork - Pages
