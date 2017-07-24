@@ -29,37 +29,37 @@ brew install yarn
 brew tap caskroom/cask
 
 # Install GUI Applications
-brew cask install --force adobe-creative-cloud
-brew cask install --force appcleaner
-brew cask install --force atom
-brew cask install --force clipy
-brew cask install --force dropbox
-brew cask install --force firefox
-brew cask install --force github-desktop
-brew cask install --force google-chrome
-brew cask install --force handbrake
-brew cask install --force hyper
-brew cask install --force sketch
-brew cask install --force slack
-brew cask install --force spotify
-brew cask install --force steam
-brew cask install --force the-unarchiver
-brew cask install --force transmission
-brew cask install --force transmit
-brew cask install --force virtualbox
-brew cask install --force vlc
+brew cask install adobe-creative-cloud
+brew cask install appcleaner
+brew cask install atom
+brew cask install clipy
+brew cask install dropbox
+brew cask install firefox
+brew cask install github-desktop
+brew cask install google-chrome
+brew cask install handbrake
+brew cask install hyper
+brew cask install sketch
+brew cask install slack
+brew cask install spotify
+brew cask install steam
+brew cask install the-unarchiver
+brew cask install transmission
+brew cask install transmit
+brew cask install virtualbox
+brew cask install vlc
 
 # Install Quick Look Plugins (https://github.com/sindresorhus/quick-look-plugins)
-brew cask install --force qlcolorcode
-brew cask install --force qlimagesize
-brew cask install --force qlmarkdown
-brew cask install --force qlstephen
-brew cask install --force qlvideo
-brew cask install --force quicklook-json
-brew cask install --force webpquicklook
+brew cask install qlcolorcode
+brew cask install qlimagesize
+brew cask install qlmarkdown
+brew cask install qlstephen
+brew cask install qlvideo
+brew cask install quicklook-json
+brew cask install webpquicklook
 
 # Install Screen Savers
-brew cask install --force aerial
+brew cask install aerial
 
 # Install Mac App Store apps
 mas install 443987910 # 1Password
