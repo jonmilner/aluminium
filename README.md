@@ -1,16 +1,21 @@
 # dotfiles
 
-## Clone
+## Install Xcode
+- Open Terminal
+- Run `git`
+- Click **Install Xcode**
+
+## Install Updates
+```shell
+sudo softwareupdate -ia --verbose
+```
+
+## Clone Repo
 ```shell
 git clone https://github.com/jonmilner/dotfiles.git ~/dotfiles
 ```
 
 ## Install
-
-### Install Updates
-```shell
-sudo softwareupdate -ia --verbose
-```
 
 ### Fix Permissions
 ```shell
@@ -60,6 +65,11 @@ Once DropBox is set up, use Mackup to restore Application settings.
 
 ```shell
 mackup restore
+```
+
+## Applications Setup
+```shell
+sh dotfiles/install/openApps.sh
 ```
 
 ## Additional Setup
