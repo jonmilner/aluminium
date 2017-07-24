@@ -5,7 +5,8 @@ echo "Screenshots"
 ###############################################################################
 
 echo "∙ Screenshot location"
-defaults write com.apple.screencapture location /User/jon/Desktop/Screenshots/
+mkdir $HOME/Documents/Screenshots/
+defaults write com.apple.screencapture location $HOME/Documents/Screenshots/
 
 echo "∙ Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)"
 defaults write com.apple.screencapture type -string "png"

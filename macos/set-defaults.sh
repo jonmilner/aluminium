@@ -16,33 +16,32 @@ osascript -e 'tell application "System Preferences" to quit'
 
 PREF_FILES=$HOME/dotfiles/macos/
 
-# System Preferences
-source $PREF_FILES/system/dashboard.sh
-source $PREF_FILES/system/date-time.sh
-source $PREF_FILES/system/displays.sh
-source $PREF_FILES/system/dock.sh
-source $PREF_FILES/system/finder.sh
-source $PREF_FILES/system/general.sh
-source $PREF_FILES/system/hot-corners.sh
-source $PREF_FILES/system/keyboard.sh
-source $PREF_FILES/system/language-region.sh
-source $PREF_FILES/system/mission-control.sh
-source $PREF_FILES/system/notifications.sh
-source $PREF_FILES/system/other.sh
-source $PREF_FILES/system/printers-scanners.sh
-source $PREF_FILES/system/screenshots.sh
-source $PREF_FILES/system/security-privacy.sh
-source $PREF_FILES/system/sound.sh
-source $PREF_FILES/system/time-machine.sh
-source $PREF_FILES/system/trackpad.sh
-source $PREF_FILES/system/users-groups.sh
-
 # Application Preferences
-source $PREF_FILES/apps/activity-monitor.sh
-source $PREF_FILES/apps/app-store.sh
-source $PREF_FILES/apps/google-chrome.sh
-source $PREF_FILES/apps/iwork.sh
-source $PREF_FILES/apps/safari.sh
+source $HOME/dotfiles/macos/apps/activity-monitor.sh
+source $HOME/dotfiles/macos/apps/app-store.sh
+source $HOME/dotfiles/macos/apps/google-chrome.sh
+source $HOME/dotfiles/macos/apps/iwork.sh
+source $HOME/dotfiles/macos/apps/safari.sh
+
+# System Preferences
+source $HOME/dotfiles/macos/system/dashboard.sh
+source $HOME/dotfiles/macos/system/date-time.sh
+source $HOME/dotfiles/macos/system/displays.sh
+source $HOME/dotfiles/macos/system/dock.sh
+source $HOME/dotfiles/macos/system/finder.sh
+source $HOME/dotfiles/macos/system/general.sh
+source $HOME/dotfiles/macos/system/hot-corners.sh
+source $HOME/dotfiles/macos/system/keyboard.sh
+source $HOME/dotfiles/macos/system/language-region.sh
+source $HOME/dotfiles/macos/system/mission-control.sh
+source $HOME/dotfiles/macos/system/other.sh
+source $HOME/dotfiles/macos/system/printers-scanners.sh
+source $HOME/dotfiles/macos/system/screenshots.sh
+source $HOME/dotfiles/macos/system/security-privacy.sh
+source $HOME/dotfiles/macos/system/sound.sh
+source $HOME/dotfiles/macos/system/time-machine.sh
+source $HOME/dotfiles/macos/system/trackpad.sh
+source $HOME/dotfiles/macos/system/users-groups.sh
 
 ###############################################################################
 # Clean Up
