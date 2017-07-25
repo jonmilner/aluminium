@@ -3,7 +3,7 @@
 ## Install Xcode
 - Open Terminal
 - Run `git`
-- Click **Install Xcode**
+- Click **Get Xcode**
 
 ## Install Updates
 ```shell
@@ -15,12 +15,33 @@ sudo softwareupdate -ia --verbose
 git clone https://github.com/jonmilner/dotfiles.git ~/dotfiles
 ```
 
-## Install
+## Apps & Settings
 
-### Fix Permissions
+### Homebrew
 ```shell
-sudo chown -R "$USER":admin /usr/local
+sh dotfiles/install/brew.sh
 ```
+
+### Sign In to Dropbox
+```shell
+open ../../Applications/Dropbox.app
+```
+
+Go to Preferences > Account > Selective Sync to prioritize download order.
+
+### Mackup
+Once DropBox is set up, use Mackup to restore Application settings.
+
+```shell
+mackup restore
+```
+
+### Applications Setup
+```shell
+sh dotfiles/install/openApps.sh
+```
+
+## Development Tools
 
 ### ZSH
 ```shell
@@ -40,11 +61,6 @@ nvm alias default node
 sh dotfiles/install/npm.sh
 ```
 
-### Homebrew
-```shell
-sh dotfiles/install/brew.sh
-```
-
 ### Symlinks
 ```shell
 sh dotfiles/setup.sh
@@ -55,21 +71,9 @@ sh dotfiles/setup.sh
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 ```
 
-### OSX defaults
+## macOS Settings
 ```shell
 sh dotfiles/macos/set-defaults.sh
-```
-
-### Mackup
-Once DropBox is set up, use Mackup to restore Application settings.
-
-```shell
-mackup restore
-```
-
-## Applications Setup
-```shell
-sh dotfiles/install/openApps.sh
 ```
 
 ## Additional Setup
