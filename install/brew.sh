@@ -70,6 +70,7 @@ mas install 731062389 # iFlicks 2
 mas install 409183694 # iWork - Keynote
 mas install 409203825 # iWork - Numbers
 mas install 409201541 # iWork - Pages
+mas install 972028355 # Micro Snitch
 mas install 497799835 # Xcode
 
 # Remove outdated versions from the cellar
