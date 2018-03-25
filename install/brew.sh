@@ -39,6 +39,7 @@ brew cask install github-desktop
 brew cask install google-chrome
 brew cask install handbrake
 brew cask install hyper
+brew cask install scroll-reverser
 brew cask install sketch
 brew cask install slack
 brew cask install spotify
