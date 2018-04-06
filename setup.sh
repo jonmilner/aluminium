@@ -14,9 +14,6 @@ done
 # Symlinks
 ###############################################################################
 
-# Atom
-ln -sfn /Applications/Atom.app/Contents/Resources/app/atom.sh /usr/local/bin/atom
-
 # bin
 ln -sfn dotfiles/bin ~/bin
 

@@ -71,6 +71,9 @@ sh dotfiles/setup.sh
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 ```
 
+### Launching Visual Studio Code from the Command Line
+Open the Command Palette (⇧⌘P) and type 'shell command' to find the **Shell Command: Install 'code' command in PATH** command.
+
 ## macOS Settings
 ```shell
 sh dotfiles/macos/set-defaults.sh
