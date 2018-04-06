@@ -31,7 +31,6 @@ brew tap caskroom/cask
 # Install GUI Applications
 brew cask install adobe-creative-cloud
 brew cask install appcleaner
-brew cask install atom
 brew cask install clipy
 brew cask install dropbox
 brew cask install firefox
@@ -49,6 +48,7 @@ brew cask install transmission
 brew cask install transmit
 brew cask install virtualbox
 brew cask install vlc
+brew cask install visual-studio-code
 
 # Install Quick Look Plugins (https://github.com/sindresorhus/quick-look-plugins)
 brew cask install qlcolorcode
