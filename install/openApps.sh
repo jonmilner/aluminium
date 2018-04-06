@@ -9,7 +9,6 @@ done
 # Open Applications
 open ../../usr/local/Caskroom/adobe-creative-cloud/latest/Creative\ Cloud\ Installer.app
 open ../../Applications/1Password.app
-open ../../Applications/Atom.app
 open ../../Applications/Clipy.app
 open ../../Applications/Divvy.app
 open ../../Applications/Dropbox.app
@@ -19,3 +18,4 @@ open ../../Applications/Google\ Chrome.app
 open ../../Applications/Hyper.app
 open ../../Applications/Slack.app
 open ../../Applications/Spotify.app
+open ../../Applications/Visual\ Studio \ Code.app

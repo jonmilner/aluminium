@@ -20,7 +20,7 @@ autoload -U promptinit; promptinit
 prompt pure
 
 # Defaults
-export EDITOR=atom
+export EDITOR=code
 
 # Aliases
 source ~/dotfiles/zsh/aliases.zsh
