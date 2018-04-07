@@ -32,6 +32,7 @@ brew tap caskroom/cask
 brew cask install adobe-creative-cloud
 brew cask install appcleaner
 brew cask install clipy
+brew cask install docker
 brew cask install dropbox
 brew cask install firefox
 brew cask install github-desktop
