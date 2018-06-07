@@ -1,13 +1,13 @@
 [user]
-  name = Jon Milner
-  email = email@jonmilner.com
+	name = Jon Milner
+	email = email@jonmilner.com
 [github]
   user = jonmilner
 [core]
   editor = "code --wait"
   attributesfile = ~/.gitattributes
   excludesfile = ~/.gitignore
-  quotepath = false
+	quotepath = false
 [alias]
   l = log --color --pretty=format:'%C(blue)%an%Creset %C(magenta)%ad%Creset %C(magenta)(%ar)%Creset %C(green)%h%Creset %C(yellow)%D%Creset \n - %s \n' --abbrev-commit --date=short
   stats = shortlog -sn
@@ -18,3 +18,8 @@
   rebase = true
 [credential]
   helper = osxkeychain
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f

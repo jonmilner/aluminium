@@ -23,7 +23,11 @@ module.exports = {
     borderColor: '#333',
 
     // custom css to embed in the main window
-    css: '',
+    css: `
+      * {
+        letter-spacing: 0.02em;
+      }
+    `,
 
     // custom css to embed in the terminal window
     termCSS: '',
