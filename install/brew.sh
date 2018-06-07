@@ -17,7 +17,7 @@ fi
 brew update
 
 # Upgrade any already-installed formulae
-brew upgrade --all
+brew upgrade
 
 # Install Packages
 brew install diff-so-fancy
