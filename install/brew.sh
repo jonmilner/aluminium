@@ -35,7 +35,7 @@ brew cask install clipy
 brew cask install docker
 brew cask install dropbox
 brew cask install firefox
-brew cask install github-desktop
+brew cask install github
 brew cask install google-chrome
 brew cask install handbrake
 brew cask install hyper
