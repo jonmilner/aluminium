@@ -17,11 +17,6 @@ git clone https://github.com/jonmilner/dotfiles.git ~/dotfiles
 
 ## Apps & Settings
 
-### Homebrew
-```shell
-sh dotfiles/install/brew.sh
-```
-
 ### Sign In to Dropbox
 ```shell
 open ../../Applications/Dropbox.app
