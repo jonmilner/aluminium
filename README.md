@@ -45,20 +45,7 @@ sh dotfiles/install/openApps.sh
 
 ### ZSH
 ```shell
-sh dotfiles/install/zsh.sh
-```
-
-### NVM
-```shell
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
-```
-
-### Node
-```shell
-nvm install stable
-nvm use node
-nvm alias default node
-sh dotfiles/install/npm.sh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 ```
 
 ### Symlinks
