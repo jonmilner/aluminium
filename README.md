@@ -1,21 +1,9 @@
 # dotfiles
 
-## Install Xcode
-- Open Terminal
-- Run `git`
-- Click **Get Xcode**
-
-## Install Updates
-```shell
-sudo softwareupdate -ia --verbose
-```
-
-## Clone Repo
+### Clone Repo
 ```shell
 git clone https://github.com/jonmilner/dotfiles.git ~/dotfiles
 ```
-
-## Apps & Settings
 
 ### Sign In to Dropbox
 ```shell
@@ -36,8 +24,6 @@ mackup restore
 sh dotfiles/install/openApps.sh
 ```
 
-## Development Tools
-
 ### ZSH
 ```shell
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
@@ -56,12 +42,10 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:
 ### Launching Visual Studio Code from the Command Line
 Open the Command Palette (⇧⌘P) and type 'shell command' to find the **Shell Command: Install 'code' command in PATH** command.
 
-## macOS Settings
+### macOS Settings
 ```shell
 sh dotfiles/macos/set-defaults.sh
 ```
-
-## Additional Setup
 
 ### Mission Control Mouse Setup
 ![Mission Control Mouse Setup](mission-control-mouse-setup.png)
