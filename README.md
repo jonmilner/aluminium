@@ -49,3 +49,9 @@ sh dotfiles/macos/set-defaults.sh
 
 ### Mission Control Mouse Setup
 ![Mission Control Mouse Setup](mission-control-mouse-setup.png)
+
+
+### Set ForkLift as default Finder
+```shell
+defaults write -g NSFileViewer -string com.binarynights.ForkLift-3
+```

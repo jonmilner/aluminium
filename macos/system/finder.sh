@@ -76,16 +76,6 @@ echo "∙ Desktop - Icon size"
 echo "∙ Desktop - Text size"
 /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:textSize 10" ~/Library/Preferences/com.apple.finder.plist
 
-echo "∙ Set view style to Column View"
-# Icon View   : `icnv`
-# List View   : `Nlsv`
-# Column View : `clmv`
-# Cover Flow  : `Flwv`
-# After configuring preferred view style, clear all `.DS_Store` files
-# to ensure settings are applied for every directory
-defaults write com.apple.finder FXPreferredViewStyle -string "clmv"
-sudo find / -name .DS_Store -delete;
-
 echo "∙ Arrange by Kind"
 # Kind, Name, Application, Date Last Opened,
 # Date Added, Date Modified, Date Created, Size, Tags, None
