@@ -15,7 +15,6 @@ done
 ###############################################################################
 
 # Git
-ln -sfn dotfiles/git/gitattributes ~/.gitattributes
 ln -sfn dotfiles/git/gitconfig ~/.gitconfig
 ln -sfn dotfiles/git/gitignore ~/.gitignore
 
