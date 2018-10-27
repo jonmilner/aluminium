@@ -210,18 +210,21 @@ if [ -e $cwd/swag/setup ]; then
 fi
 
 ###############################################################################
-# OPTIONAL: Customizations
+# Symlinks
 ###############################################################################
-chapter "Adding hot sauce…"
-if [ -f "$HOME/.hot-sauce" ]; then
-	if ask "Do you want to add hot sauce?" Y; then
-		. "$HOME/.hot-sauce"; printf "\n  You got hot sauce in your bag. 🔥 ${bold}Swag.${normal}\n";
-	else
-		print_success_muted "Hot sauce declined. Skipped.";
-	fi
-else
-	print_warning "No ~/.hot-sauce found. Skipping."
-fi
+
+# Git
+ln -sfn dotfiles/git/gitconfig ~/.gitconfig
+ln -sfn dotfiles/git/gitignore ~/.gitignore
+
+# Hyper
+ln -sfn dotfiles/hyper.js ~/.hyper.js
+
+# Mackup
+ln -sfn dotfiles/mackup/mackup.cfg ~/.mackup.cfg
+
+# zsh
+ln -sfn dotfiles/zsh/zshrc ~/.zshrc
 
 ###############################################################################
 # 🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋🍋
