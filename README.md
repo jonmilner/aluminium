@@ -1,57 +1,67 @@
-# dotfiles
+# 💻 Aluminium
 
-### Clone Repo
-```shell
-git clone https://github.com/jonmilner/dotfiles.git ~/dotfiles
-```
+Aluminium is a shell script to set up a new macOS environment.
 
-### Sign In to Dropbox
-```shell
-open ../../Applications/Dropbox.app
-```
+## Reinstall macOS (Optional)
 
-Go to Preferences > Account > Selective Sync to prioritize download order.
+Reboot into **Recovery Mode** by holding the Command (⌘) and R keys until the Apple logo appears on the screen.
 
-### Mackup
-Once DropBox is set up, use Mackup to restore Application settings.
+## Run Aluminium
 
-```shell
-mackup restore
-```
+The following steps should be run in order.
 
-### Applications Setup
-```shell
-sh dotfiles/install/openApps.sh
-```
+### 1. 🗜 Install Xcode
 
-### ZSH
-```shell
+- Open Terminal
+- Run `git`
+- Click **Get Xcode**
+
+### 2. 🧟‍ Install zsh
+```sh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 ```
 
-### Symlinks
-```shell
-sh dotfiles/setup.sh
-```
-
-### zsh-syntax-highlighting
-```shell
+### 3. 🎨 Install zsh-syntax-highlighting
+```sh
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 ```
 
-### Launching Visual Studio Code from the Command Line
-Open the Command Palette (⇧⌘P) and type 'shell command' to find the **Shell Command: Install 'code' command in PATH** command.
+### 4. 👨‍💻 Sign into App Store
 
-### macOS Settings
-```shell
-sh dotfiles/macos/set-defaults.sh
+This needs to be done manually prior to running the script.
+
+### 5. ⬇️ Download Aluminium
+```sh
+git clone https://github.com/jonmilner/aluminium.git ~/aluminium
 ```
 
-### Mission Control Mouse Setup
-![Mission Control Mouse Setup](mission-control-mouse-setup.png)
-
-
-### Set ForkLift as default Finder
-```shell
-defaults write -g NSFileViewer -string com.binarynights.ForkLift-3
+### 6. 💾 Run the Script
+```sh
+sh aluminium
 ```
+
+### 7. 📦 Configure Dropbox
+Once setup, go to Preferences > Account > Selective Sync to prioritize download order for Mackup.
+
+### 8. ⏮ Mackup
+Use Mackup to restore Application settings from Dropbox.
+
+```sh
+mackup restore
+```
+
+### 9. 🤫 Add `zsh/private.zsh`
+Copy `private.zsh` to `~/aluminium/dotfiles/zsh`
+
+### 10. ⌨️ Open VSCode from Command Line with `code .`
+Open the Command Palette (⇧⌘P) and type `shell command` to find the **Shell Command: Install 'code' command in PATH** command.
+
+### 11. 🖱 Add Mission Control to External Mouse Buttons
+
+![Mission Control Mouse Setup](assets/mission-control-mouse-setup.png)
+
+---
+
+## Acknowledgements
+
+- [Formation](https://github.com/minamarkham/formation) by Mina Markham.

@@ -2,7 +2,7 @@
 export ZSH=$HOME/.oh-my-zsh
 
 # Custom folder
-ZSH_CUSTOM=$HOME/dotfiles/zsh
+ZSH_CUSTOM=$HOME/aluminium/dotfiles/zsh
 
 # Theme
 ZSH_THEME=""
@@ -13,7 +13,7 @@ plugins=(git zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
 # Include z, yo
-. ~/dotfiles/zsh/z.sh
+. ~/aluminium/dotfiles/zsh/z.sh
 
 # Pure https://github.com/sindresorhus/pure
 autoload -U promptinit; promptinit
@@ -23,13 +23,13 @@ prompt pure
 export EDITOR=code
 
 # Aliases
-source ~/dotfiles/zsh/aliases.zsh
+source ~/aluminium/dotfiles/zsh/aliases.zsh
 
 # History
-source ~/dotfiles/zsh/history.zsh
+source ~/aluminium/dotfiles/zsh/history.zsh
 
 # Private settings
-[ -f ~/dotfiles/zsh/private.zsh ] && source ~/dotfiles/zsh/private.zsh
+[ -f ~/aluminium/dotfiles/zsh/private.zsh ] && source ~/aluminium/dotfiles/zsh/private.zsh
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
