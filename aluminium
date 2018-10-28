@@ -241,7 +241,7 @@ ln -sfn aluminium/dotfiles/git/gitignore ~/.gitignore
 ln -sfn aluminium/dotfiles/hyper.js ~/.hyper.js
 
 # Mackup
-ln -sfn aluminium/dotfiles/mackup/mackup.cfg ~/.mackup.cfg
+ln -sfn aluminium/dotfiles/mackup.cfg ~/.mackup.cfg
 
 # zsh
 ln -sfn aluminium/dotfiles/zsh/zshrc ~/.zshrc
