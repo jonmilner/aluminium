@@ -32,7 +32,7 @@ This needs to be done manually prior to running the script.
 
 ### 5. ⬇️ Download Aluminium
 ```sh
-git clone https://github.com/jonmilner/aluminium.git ~/aluminium
+git clone https://github.com/jonmilner/aluminium.git ~/aluminium && cd aluminium
 ```
 
 ### 6. 💾 Run the Script
