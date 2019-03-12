@@ -29,7 +29,7 @@ source ~/aluminium/dotfiles/zsh/aliases.zsh
 source ~/aluminium/dotfiles/zsh/history.zsh
 
 # Private settings
-[ -f ~/aluminium/dotfiles/zsh/private.zsh ] && source ~/aluminium/dotfiles/zsh/private.zsh
+[ -f ~/Dropbox/dotfiles/private.zsh ] && source ~/Dropbox/dotfiles/private.zsh
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
