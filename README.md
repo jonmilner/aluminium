@@ -40,25 +40,15 @@ git clone https://github.com/jonmilner/aluminium.git ~/aluminium && cd aluminium
 sh aluminium
 ```
 
-### 7. 📦 Configure Dropbox
-Once setup, go to Preferences > Account > Selective Sync to prioritize download order for Mackup.
-
-### 8. ⏮ Mackup
+### 7. ⏮ Mackup
 Use Mackup to restore Application settings from Dropbox.
 
 ```sh
 mackup restore
 ```
 
-### 9. 🤫 Add `zsh/private.zsh`
-Copy `private.zsh` to `~/aluminium/dotfiles/zsh`
-
-### 10. ⌨️ Open VSCode from Command Line with `code .`
+### 8. ⌨️ Open VSCode from Command Line with `code .`
 Open the Command Palette (⇧⌘P) and type `shell command` to find the **Shell Command: Install 'code' command in PATH** command.
-
-### 11. 🖱 Add Mission Control to External Mouse Buttons
-
-![Mission Control Mouse Setup](assets/mission-control-mouse-setup.png)
 
 ---
 
