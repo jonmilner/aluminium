@@ -94,10 +94,19 @@ echo "∙ View Options"
 #   ascd : Date Created
 #   logs : Size
 #   labl : Tags
-/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:columnShowIcons false" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:textSize 10" ~/Library/Preferences/com.apple.finder.plist
+# /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:columnShowIcons false" ~/Library/Preferences/com.apple.finder.plist
+/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:textSize 11" ~/Library/Preferences/com.apple.finder.plist
 /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
 /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy kipl" ~/Library/Preferences/com.apple.finder.plist
+
+echo "∙ Sidebar icon size"
+# Small  : 1
+# Medium : 2
+# Large  : 3
+defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 1
+
+echo "∙ Set Sidebar Width"
+/usr/libexec/PlistBuddy -c "Set :SidebarWidth 192" ~/Library/Preferences/com.apple.finder.plist
 
 echo "∙ New window target"
 # Computer     : `PfCm`
@@ -122,9 +131,9 @@ echo "∙ Set the finder window toolbar to only have back/forward buttons"
 /usr/libexec/PlistBuddy -c "Add :NSToolbar\ Configuration\ Browser:TB\ Item\ Identifiers:1 string com.apple.finder.BACK" ~/Library/Preferences/com.apple.finder.plist
 
 echo "∙ Remove all tags from contextual menu"
-/usr/libexec/PlistBuddy -c "Delete :FavoriteTagNames" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Add :FavoriteTagNames array" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Add :FavoriteTagNames:0 string" ~/Library/Preferences/com.apple.finder.plist
+# /usr/libexec/PlistBuddy -c "Delete :FavoriteTagNames" ~/Library/Preferences/com.apple.finder.plist
+# /usr/libexec/PlistBuddy -c "Add :FavoriteTagNames array" ~/Library/Preferences/com.apple.finder.plist
+# /usr/libexec/PlistBuddy -c "Add :FavoriteTagNames:0 string" ~/Library/Preferences/com.apple.finder.plist
 
 echo "∙ Expand File Info panes"
 defaults write com.apple.finder FXInfoPanesExpanded -dict \

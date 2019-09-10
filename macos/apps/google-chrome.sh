@@ -4,9 +4,6 @@
 echo "Google Chrome"
 ###############################################################################
 
-echo "∙ Make Google Chrome the default browser"
-open -a "Google Chrome" --args --make-default-browser
-
 echo "∙ Use the system-native print preview dialog"
 defaults write com.google.Chrome DisablePrintPreview -bool true
 defaults write com.google.Chrome.canary DisablePrintPreview -bool true

@@ -18,7 +18,6 @@ source $HOME/aluminium/macos/apps/iwork.sh
 source $HOME/aluminium/macos/apps/safari.sh
 
 # System Preferences
-source $HOME/aluminium/macos/system/dashboard.sh
 source $HOME/aluminium/macos/system/date-time.sh
 source $HOME/aluminium/macos/system/displays.sh
 source $HOME/aluminium/macos/system/dock.sh

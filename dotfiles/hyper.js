@@ -2,6 +2,7 @@ module.exports = {
   config: {
     // default font size in pixels for all tabs
     fontSize: 16,
+    fontWeight: "500",
 
     // font family with optional fallbacks
     fontFamily: '"Operator Mono", monospace',
