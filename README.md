@@ -21,23 +21,23 @@ The following steps should be run in order.
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 ```
 
-### 3. 🎨 Install zsh-syntax-highlighting
-```sh
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-```
-
-### 4. 👨‍💻 Sign into App Store
+### 3. 👨‍💻 Sign into App Store
 
 This needs to be done manually prior to running the script.
 
-### 5. ⬇️ Download Aluminium
+### 4. ⬇️ Download Aluminium
 ```sh
 git clone https://github.com/jonmilner/aluminium.git ~/aluminium && cd aluminium
 ```
 
-### 6. 💾 Run the Script
+### 5. 💾 Run the Script
 ```sh
 sh aluminium
+```
+
+### 6. 🎨 Install zsh-syntax-highlighting
+```sh
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 ```
 
 ### 7. ⏮ Mackup
