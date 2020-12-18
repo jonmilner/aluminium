@@ -199,19 +199,6 @@ if [ -e $cwd/install/open ]; then
 fi
 
 ###############################################################################
-# SETUP: Set ForkLift as default Finder
-###############################################################################
-if [[ ! $(brew cask list | grep forklift) ]]; then
-  chapter "Set ForkLift as default Finder"
-
-  if ask "Do you want to set ForkLift as default Finder?" Y; then
-    defaults write -g NSFileViewer -string com.binarynights.ForkLift-3
-  else
-    print_success_muted "Skipping ForkLift setup.";
-  fi
-fi
-
-###############################################################################
 # SETUP: Open Applications
 ###############################################################################
 if [ -e $cwd/install/open ]; then
