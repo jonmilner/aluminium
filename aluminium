@@ -106,7 +106,7 @@ else
   print_success_muted "Homebrew already installed. Skipping."
 fi
 
-if brew list | grep -Fq brew-cask; then
+if brew list --formula | grep -Fq brew-cask; then
   step "Uninstalling old Homebrew-Cask..."
   brew uninstall --force brew-cask
   print_success "Homebrew-Cask uninstalled!"
