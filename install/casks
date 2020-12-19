@@ -6,6 +6,7 @@ clipy
 docker
 dropbox
 firefox
+fontbase
 gifox
 github
 google-chrome
@@ -13,9 +14,10 @@ google-chrome-canary
 hyper
 hyperdock
 imageoptim
+jiggler
 kap
-karabiner-elements
 kitematic
+nightfall
 private-internet-access
 safari-technology-preview
 scroll-reverser
