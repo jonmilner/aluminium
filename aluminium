@@ -136,7 +136,11 @@ if [ -e $cwd/install/casks ]; then
   chapter "Installing apps via Homebrew..."
 
   for cask in $(<$cwd/install/casks); do
-    install_application_via_brew $cask
+    if ask "Do you want to install $cask?" Y; then
+      install_application_via_brew $cask
+    else
+      print_success_muted "Skipping $cask.";
+    fi
   done
 fi
 
@@ -155,9 +159,13 @@ if [ -x mas ]; then
       # Workaround for associative array in Bash 3
       # https://stackoverflow.com/questions/6047648/bash-4-associative-arrays-error-declare-a-invalid-option
       for app in $(<$cwd/install/apps); do
-        KEY="${app%%::*}"
-        VALUE="${app##*::}"
-        install_application_via_app_store $KEY $VALUE
+        if ask "Do you want to install $app?" Y; then
+          KEY="${app%%::*}"
+          VALUE="${app##*::}"
+          install_application_via_app_store $KEY $VALUE
+        else
+          print_success_muted "Skipping $app.";
+        fi
       done
     else
       print_warning "Please signin to App Store first. Skipping."
