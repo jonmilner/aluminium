@@ -77,11 +77,11 @@ fi
 # -----------------------------------------------------------------------------
 if [ -x nvm ]; then
   step "Installing NVM..."
-  
+
   if [ ! -d "$HOME/.nvm/" ]; then
     mkdir "$HOME/.nvm"
   fi
-  
+
   curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
   print_success "NVM installed!"
   step "Installing latest Node..."
@@ -231,9 +231,6 @@ ln -sfn aluminium/dotfiles/git/gitignore ~/.gitignore
 
 # Hyper
 ln -sfn aluminium/dotfiles/hyper.js ~/.hyper.js
-
-# Mackup
-ln -sfn aluminium/dotfiles/mackup.cfg ~/.mackup.cfg
 
 # npm
 ln -sfn aluminium/dotfiles/npmrc ~/.npmrc

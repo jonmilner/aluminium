@@ -17,6 +17,7 @@ The following steps should be run in order.
 - Click **Get Xcode**
 
 ### 2. 🧟‍ Install zsh
+
 ```sh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 ```
@@ -26,28 +27,25 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 This needs to be done manually prior to running the script.
 
 ### 4. ⬇️ Download Aluminium
+
 ```sh
 git clone https://github.com/jonmilner/aluminium.git ~/aluminium && cd aluminium
 ```
 
 ### 5. 💾 Run the Script
+
 ```sh
 sh aluminium
 ```
 
 ### 6. 🎨 Install zsh-syntax-highlighting
+
 ```sh
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 ```
 
-### 7. ⏮ Mackup
-Use Mackup to restore Application settings from Dropbox.
+### 7. ⌨️ Open VSCode from Command Line with `code .`
 
-```sh
-mackup restore
-```
-
-### 8. ⌨️ Open VSCode from Command Line with `code .`
 Open the Command Palette (⇧⌘P) and type `shell command` to find the **Shell Command: Install 'code' command in PATH** command.
 
 ---
