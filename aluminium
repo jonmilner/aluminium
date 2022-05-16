@@ -155,21 +155,17 @@ if [ -x mas ]; then
   else
 
   if [ -e $cwd/install/apps ]; then
-    if mas_setup; then
-      # Workaround for associative array in Bash 3
-      # https://stackoverflow.com/questions/6047648/bash-4-associative-arrays-error-declare-a-invalid-option
-      for app in $(<$cwd/install/apps); do
-        if ask "Do you want to install $app?" Y; then
-          KEY="${app%%::*}"
-          VALUE="${app##*::}"
-          install_application_via_app_store $KEY $VALUE
-        else
-          print_success_muted "Skipping $app.";
-        fi
-      done
-    else
-      print_warning "Please signin to App Store first. Skipping."
-    fi
+    # Workaround for associative array in Bash 3
+    # https://stackoverflow.com/questions/6047648/bash-4-associative-arrays-error-declare-a-invalid-option
+    for app in $(<$cwd/install/apps); do
+      if ask "Do you want to install $app?" Y; then
+        KEY="${app%%::*}"
+        VALUE="${app##*::}"
+        install_application_via_app_store $KEY $VALUE
+      else
+        print_success_muted "Skipping $app.";
+      fi
+    done
   fi
 
 fi

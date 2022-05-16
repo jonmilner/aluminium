@@ -528,14 +528,6 @@ ssh_key_setup() {
   fi
 }
 
-mas_setup() {
-  if mas account > /dev/null; then
-    return 0
-  else
-    return 1
-  fi
-}
-
 gem_install_or_update() {
   if gem list "$1" --installed > /dev/null; then
     gem update "$@"
