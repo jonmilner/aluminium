@@ -1,2 +1,2 @@
-dotfiles/zsh/private.zsh
-dotfiles/zsh/plugins
+Brewfile.local
+Brewfile.lock.json

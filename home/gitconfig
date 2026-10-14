@@ -1,0 +1,19 @@
+[user]
+	name = Jon Milner
+	email = jonmilner@users.noreply.github.com
+[github]
+	user = jonmilner
+[core]
+	editor = code --wait
+	quotepath = false
+[alias]
+	l = log --color --pretty=format:'%C(blue)%an%Creset %C(magenta)%ad%Creset %C(magenta)(%ar)%Creset %C(green)%h%Creset %C(yellow)%D%Creset \n - %s \n' --abbrev-commit --date=short
+	stats = shortlog -sn
+[pull]
+	rebase = true
+[push]
+	default = current
+[credential]
+	helper = osxkeychain
+[init]
+	defaultBranch = main

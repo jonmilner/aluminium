@@ -27,4 +27,4 @@ alias gcm="git commit -m"
 
 # stash
 alias gsp="git stash pop"
-alias gst="git stash save -u"
+alias gst="git stash push -u"

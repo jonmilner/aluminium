@@ -1,0 +1,56 @@
+# Repo root, resolved from this file's symlink (~/.zshrc -> <repo>/home/zshrc)
+ALUMINIUM=${${(%):-%x}:A:h:h}
+
+# PATH (Homebrew also adds its zsh completions and functions to fpath)
+for brew in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+  [[ -x $brew ]] && { eval "$($brew shellenv)"; break }
+done
+unset brew
+path=($HOME/bin $HOME/.local/bin $path)
+
+# Node and package managers (Vite+ picks the version from .nvmrc per project)
+[[ -r $HOME/.config/vite-plus/env ]] && . "$HOME/.config/vite-plus/env"
+typeset -U path
+
+export EDITOR="code --wait"
+export CLICOLOR=1
+
+setopt auto_cd interactive_comments
+
+# Completion
+autoload -Uz compinit && compinit
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*' menu select
+
+# Up/Down search history for what's already typed
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search '^[OA' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search '^[OB' down-line-or-beginning-search
+
+# Prompt (https://github.com/sindresorhus/pure)
+autoload -U promptinit && promptinit
+prompt pure
+
+# Tools
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
+(( $+commands[fzf] )) && source <(fzf --zsh)
+
+source $ALUMINIUM/zsh/history.zsh
+source $ALUMINIUM/zsh/aliases.zsh
+source $ALUMINIUM/zsh/functions.zsh
+
+# Secrets (iCloud Drive, never in this repo)
+secrets="$HOME/Library/Mobile Documents/com~apple~CloudDocs/dotfiles/secrets.zsh"
+[[ -r $secrets ]] && source $secrets
+unset secrets
+
+# Machine-specific settings (untracked)
+[[ -r $HOME/.zshrc.local ]] && source $HOME/.zshrc.local
+
+# Plugins (syntax highlighting must load last)
+for plugin in zsh-autosuggestions zsh-syntax-highlighting; do
+  [[ -r $HOMEBREW_PREFIX/share/$plugin/$plugin.zsh ]] && source $HOMEBREW_PREFIX/share/$plugin/$plugin.zsh
+done
+unset plugin
