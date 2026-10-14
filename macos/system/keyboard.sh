@@ -31,3 +31,6 @@ echo "∙ Turn off autocorrect, auto-capitalisation and double-space period"
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
 defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+
+echo "∙ Tab moves focus between all controls"
+defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
