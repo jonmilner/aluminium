@@ -19,24 +19,29 @@ defaults write com.apple.dock show-recents -bool FALSE
 echo "∙ Fade hidden applications"
 defaults write com.apple.dock showhidden -bool true
 
-# Remove the apps macOS puts in the Dock, on a new Mac or after an update,
-# except these. The list comes from the Dock's own resources, so apps that a
-# future macOS adds are covered too. Apps you add yourself are left alone.
+# Once per Mac, remove the apps macOS puts in the Dock, except these. The list
+# comes from the Dock's own resources (current and older macOS), so it covers
+# whatever this Mac started with. Later runs leave the Dock's apps alone, so an
+# app you put back stays. Delete the marker file to run it again.
 dock_keep=" com.apple.finder com.apple.Safari com.apple.MobileSMS com.apple.Photos com.apple.systempreferences "
-echo "∙ Remove macOS default apps from the Dock"
-dock_res=/System/Library/CoreServices/Dock.app/Contents/Resources
-docked=$(dockutil --list --no-restart 2>/dev/null | cut -f5)
-{
-  for f in "$dock_res"/default{,-old}.plist "$dock_res"/com.apple.dockfixup{,-old}.plist; do
-    plutil -p "$f" 2>/dev/null | sed -n 's/.*"_CFURLString" => "\(.*\.app\)\/*"$/\1/p' |
-      while IFS= read -r path; do defaults read "$path/Contents/Info" CFBundleIdentifier 2>/dev/null; done
-    plutil -p "$f" 2>/dev/null | sed -n 's/.*"bundle-identifier" => "\(.*\)"$/\1/p'
+dock_marker="$HOME/.local/state/aluminium/dock-cleaned"
+if [[ ! -e $dock_marker ]]; then
+  echo "∙ Remove macOS default apps from the Dock (first run on this Mac)"
+  dock_res=/System/Library/CoreServices/Dock.app/Contents/Resources
+  docked=$(dockutil --list --no-restart 2>/dev/null | cut -f5)
+  {
+    for f in "$dock_res"/default{,-old}.plist "$dock_res"/com.apple.dockfixup{,-old}.plist; do
+      plutil -p "$f" 2>/dev/null | sed -n 's/.*"_CFURLString" => "\(.*\.app\)\/*"$/\1/p' |
+        while IFS= read -r path; do defaults read "$path/Contents/Info" CFBundleIdentifier 2>/dev/null; done
+      plutil -p "$f" 2>/dev/null | sed -n 's/.*"bundle-identifier" => "\(.*\)"$/\1/p'
+    done
+  } | sort -u | while IFS= read -r id; do
+    [[ $dock_keep == *" $id "* ]] && continue
+    grep -qxF "$id" <<<"$docked" || continue
+    dockutil --remove "$id" --no-restart >/dev/null && echo "  removed $id"
   done
-} | sort -u | while IFS= read -r id; do
-  [[ $dock_keep == *" $id "* ]] && continue
-  grep -qxF "$id" <<<"$docked" || continue
-  dockutil --remove "$id" --no-restart >/dev/null && echo "  removed $id"
-done
+  mkdir -p "${dock_marker%/*}" && touch "$dock_marker"
+fi
 
 # Add the apps that Brewfile (and Brewfile.local) installed, if the Dock doesn't
 # already have them. Never removes or reorders anything. Menu bar utilities and
