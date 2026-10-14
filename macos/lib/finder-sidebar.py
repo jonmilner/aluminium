@@ -5,7 +5,10 @@ macOS 26), which talks to sharedfilelistd. The .sfl4 files it stores are
 protected by TCC and in a private format, so they can't be edited directly.
 
 usage: python3 -I finder-sidebar.py [--dry-run]
-Rewrites Favorites only when they differ from the target, so re-runs are no-ops.
+Removes favorites that aren't in the target, then moves or adds each target
+item into place. Inserting an item that's already listed moves it, so nothing
+in the target is ever removed: some items (cloud-provider folders such as
+SynologyDrive) can't be added back by this API, only by dragging in Finder.
 """
 import ctypes as C
 import os
@@ -18,7 +21,7 @@ DRY_RUN = "--dry-run" in sys.argv
 def favorites():
     """Favorites, in order. Folders that don't exist on this Mac are skipped."""
     return [
-        folder("/"),  # Macintosh HD
+        startup_volume(),  # Macintosh HD
         special("IsHome", file_url(HOME)),
         folder("/Applications"),
         folder(HOME + "/Desktop"),
@@ -99,6 +102,15 @@ def folder(path):
     return ("path:" + os.path.realpath(path), file_url(path), None)
 
 
+def startup_volume():
+    # Adding "/" fails; its /Volumes entry (a link to /) works, whatever its name.
+    for name in sorted(os.listdir("/Volumes")):
+        path = "/Volumes/" + name
+        if os.path.realpath(path) == "/":
+            return ("path:/", file_url(path), None)
+    return None
+
+
 def special(name, url):
     return ("special:" + name, url, "com.apple.LSSharedFileList." + name)
 
@@ -132,22 +144,31 @@ def main():
     fav = cs.LSSharedFileListCreate(None, P.in_dll(cs, "kLSSharedFileListFavoriteItems"), None)
     vol = cs.LSSharedFileListCreate(None, P.in_dll(cs, "kLSSharedFileListFavoriteVolumes"), None)
     target = [t for t in favorites() if t]
-    have = snapshot(fav)
-    want_keys = [key for key, _, _ in target]
-    have_keys = [key for key, _ in have]
+    want = [key for key, _, _ in target]
+    have = [key for key, _ in snapshot(fav)]
 
-    if have_keys == want_keys:
+    if have == want:
         print("  Sidebar favorites already match")
     elif DRY_RUN:
-        print("  Sidebar favorites differ:\n    have: %s\n    want: %s" % (have_keys, want_keys))
+        print("  Sidebar favorites differ:\n    have: %s\n    want: %s" % (have, want))
     else:
-        for _, item in have:
-            cs.LSSharedFileListItemRemove(fav, item)
+        for key, item in snapshot(fav):
+            if key not in want:
+                cs.LSSharedFileListItemRemove(fav, item)
+        after = P(C.c_size_t.in_dll(cs, "kLSSharedFileListItemBeforeFirst").value)
         for key, url, sid in target:
-            if not cs.LSSharedFileListInsertItemURL(fav, LAST, None, None, url(), props_for(sid), None):
-                print("  ! Couldn't add %s to the sidebar" % key, file=sys.stderr)
+            item = cs.LSSharedFileListInsertItemURL(fav, after, None, None, url(), props_for(sid), None)
+            if not item:
+                existing = [i for k, i in snapshot(fav) if k == key]
+                print("  ! Couldn't %s %s %s the sidebar%s" % (
+                    "move" if existing else "add", key.split(":", 1)[1], "in" if existing else "to",
+                    "" if existing else "; drag it in from Finder"), file=sys.stderr)
+                if not existing:
+                    continue
+                item = existing[0]
+            after = P(item)
         result = [key for key, _ in snapshot(fav)]
-        print("  Sidebar favorites rewritten" if result == want_keys else
+        print("  Sidebar favorites updated" if result == want else
               "  ! Sidebar favorites still differ: %s" % result)
 
     if not DRY_RUN:
