@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Open a fresh macOS VM for trying bootstrap by hand. Replaces the previous one.
+# Needs Tart (https://tart.run); the first run downloads a ~28 GB image.
+#
+#   scripts/test-vm            macOS 26.6.2
+#   scripts/test-vm 15.7.7     another version (15.x = Sequoia, 26.x = Tahoe)
+#
+# In the VM, log in as admin (password: admin), open Terminal and run:
+#   curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/main/bootstrap | bash
+# To test a branch, use its name in place of `main` in the URL, and run
+#   ... | ALUMINIUM_REF=<branch> bash
+
+set -euo pipefail
+
+version=${1:-26.6.2}
+case $version in
+  15.*) codename=sequoia ;;
+  26.*) codename=tahoe ;;
+  *) echo "Unknown macOS version: $version" >&2; exit 1 ;;
+esac
+
+if ! command -v tart >/dev/null 2>&1; then
+  echo "Tart isn't installed. See docs/plans/automated-testing.md." >&2
+  exit 1
+fi
+
+vm=aluminium-test
+tart delete "$vm" 2>/dev/null || true
+tart clone "ghcr.io/cirruslabs/macos-$codename-vanilla:$version" "$vm"
+tart run "$vm"

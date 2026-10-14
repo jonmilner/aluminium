@@ -6,6 +6,8 @@
 #
 # New Mac (clones to ~/aluminium, or $ALUMINIUM_DIR):
 #   curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/main/bootstrap | bash
+# A branch, before it merges:
+#   curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/<branch>/bootstrap | ALUMINIUM_REF=<branch> bash
 #
 # Written for the stock macOS bash 3.2.
 
@@ -279,7 +281,7 @@ if [[ ! -f ${BASH_SOURCE[0]} ]]; then
   say "xcode"
   step_xcode
   if [[ ! -e $dir/.git ]]; then
-    git clone "$REPO_URL" "$dir"
+    git clone --branch "${ALUMINIUM_REF:-main}" "$REPO_URL" "$dir"
   fi
   # stdin is the curl pipe; prompts need the terminal.
   if (exec </dev/tty) 2>/dev/null; then

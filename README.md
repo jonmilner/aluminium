@@ -58,6 +58,10 @@ cd ~/aluminium && git pull && ./bootstrap
 
 Run single steps by name, e.g. `./bootstrap links github`. Steps, in order: `xcode`, `homebrew`, `github`, `packages`, `vite`, `links`, `secrets`, `macos`, `checklist`. `macos` only runs when named, until its scripts are refreshed.
 
+## Testing
+
+`scripts/test-vm [version]` opens a fresh macOS VM (needs [Tart](https://tart.run); the first run downloads a ~28 GB image). Log in as `admin` / `admin`, open Terminal and run the `curl` command above. To test a branch before it merges, put the branch name in the URL in place of `main` and pipe to `ALUMINIUM_REF=<branch> bash`. Automated tests are planned in [docs/plans/automated-testing.md](docs/plans/automated-testing.md).
+
 ## Layout
 
 | Path | What |
