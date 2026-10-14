@@ -44,13 +44,15 @@ The live `~/.gitconfig` and Ghostty symlinks, and the live `~/.zshrc`, still poi
 - [x] README rewritten around `bootstrap`.
 - Tested in a throwaway `$HOME`: `links` (backups, re-run), `secrets`, unknown steps, `curl` mode. Not yet run for real: `homebrew`, `packages`, `vite`, `ssh`, `macos`.
 
-**Merge after phase 3.** `bootstrap` doesn't install oh-my-zsh, so the current `zshrc` would fail on a new Mac. Merging also breaks syntax highlighting here, because that plugin lives in the old `dotfiles/zsh/plugins` folder.
+Ready to merge after phase 3. See "First run on an existing Mac" in the README.
 
 ### 3. Shell and dev tooling
-- Rewrite `zshrc` without oh-my-zsh. Keep `~/.zshrc` as a stub that sources the repo, so installers that append to it don't break the link.
-- Vite+ only: remove `fnm` and the `chpwd` hook. Check whether Vite+ switches Node per project from `.nvmrc`. Pick one pnpm (remove `PNPM_HOME` or Vite+'s copy).
-- Fix `gitconfig`: drop the missing `~/.gitattributes`, move the global ignore to `~/.config/git/ignore`. (The diff-so-fancy pager and LFS filter are already gone: changes are reviewed in GitHub Desktop and no repos use LFS.)
-- Set `EDITOR="code --wait"`.
+- [x] `zshrc` rewritten without oh-my-zsh: Homebrew `shellenv`, Vite+, completion (case-insensitive, menu), Up/Down history search, Pure, zoxide, fzf, autosuggestions, syntax highlighting. Loads `zsh/history.zsh`, `aliases.zsh`, `functions.zsh` (`flatten-movies`), secrets from iCloud Drive, then `~/.zshrc.local`.
+- [x] `~/.zshrc` links straight to the repo instead of a stub: any installer that appends to it shows up in `git diff`, and `bootstrap` re-links if one replaces the file.
+- [x] Vite+ only. It resolves Node from `.nvmrc` per project, so the fnm hook is gone. `PNPM_HOME` dropped (it held only a spare pnpm, no global packages).
+- [x] `gitconfig`: removed the missing `~/.gitattributes`, the diff-so-fancy pager and the LFS filter. The global ignore moved to `~/.config/git/ignore`, which git reads by default. `bootstrap` removes the old `~/.gitignore` link.
+- [x] `EDITOR="code --wait"`. `gst` uses `git stash push` (`stash save` is deprecated).
+- Tested in a throwaway `$HOME`: the shell loads with no errors other than Pure, which isn't installed via Homebrew yet. Pure loads once it's on `fpath`.
 
 ### 4. Refresh macOS defaults
 - Check every key against macOS 26 and remove dead ones (Dashboard hot corner, `AppleFontSmoothing`, `QLEnableTextSelection`, `EmptyTrashSecurely`, Safari keys that are now sandboxed, "System Preferences" references).

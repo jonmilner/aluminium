@@ -19,11 +19,14 @@ SECRETS="$ICLOUD/dotfiles/secrets.zsh"
 LINKS=(
   "home/zshrc:.zshrc"
   "home/gitconfig:.gitconfig"
-  "home/gitignore:.gitignore"
   "home/npmrc:.npmrc"
   "home/ssh_config:.ssh/config"
   "config/ghostty/config:.config/ghostty/config"
+  "config/git/ignore:.config/git/ignore"
 )
+
+# Links from older layouts, removed if still present
+RETIRED_LINKS=(.gitignore .hyper.js)
 
 # `macos` runs only when named until its scripts are refreshed (PLAN.md phase 4).
 DEFAULT_STEPS=(xcode homebrew packages vite links ssh secrets checklist)
@@ -102,6 +105,12 @@ step_links() {
   local entry src rel dst stamp
   stamp=$(date +%Y%m%d-%H%M%S)
   mkdir -p -m 700 "$HOME/.ssh"
+  for rel in "${RETIRED_LINKS[@]}"; do
+    if [[ -L $HOME/$rel ]]; then
+      rm "$HOME/$rel"
+      ok "Removed old link ~/$rel"
+    fi
+  done
   for entry in "${LINKS[@]}"; do
     src="$REPO/${entry%%:*}"
     rel="${entry#*:}"

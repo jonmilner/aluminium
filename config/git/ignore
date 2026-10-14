@@ -1,0 +1,15 @@
+# Global ignores (git reads ~/.config/git/ignore by default)
+private
+
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editors
+*~
+
+# Node
+node_modules
+npm-debug.log

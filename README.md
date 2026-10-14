@@ -20,6 +20,17 @@ Sets up a Mac, or re-syncs one, with a single script.
 cd ~/aluminium && git pull && ./bootstrap
 ```
 
+### First run on an existing Mac
+
+`bootstrap` moves your current `~/.zshrc` and other dotfiles to `*.backup-<date>` files. Once the new shell works, these are safe to remove:
+
+```sh
+rm -rf ~/.oh-my-zsh ~/.zsh/pure ~/Library/pnpm ~/aluminium/dotfiles
+brew uninstall fnm
+```
+
+### Steps
+
 Run single steps by name, e.g. `./bootstrap links ssh`. Steps: `xcode`, `homebrew`, `packages`, `vite`, `links`, `ssh`, `secrets`, `macos`, `checklist`. `macos` only runs when named, until its scripts are refreshed.
 
 ## Layout
