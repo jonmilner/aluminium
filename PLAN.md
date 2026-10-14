@@ -81,12 +81,14 @@ Proposed `agents` step, after `github` (jonai is private, so cloning needs the S
 1. Install Claude Code with its native installer if `claude` is missing (matches this Mac: `~/.local/bin/claude`, which updates itself).
 2. Clone `jonmilner/jonai` to `~/git/jonai` over SSH if it isn't there.
 3. Link `~/.config/jonai` (jonai's local layer: personal `AGENTS.md` and `denylist`) to `iCloud Drive/dotfiles/jonai`. This must happen before step 4, or `link.sh` creates a fresh layer from `local.example`.
-4. Run `~/git/jonai/scripts/link.sh` from the main checkout. This also fixes this Mac's `~/.claude/CLAUDE.md`, which imports from the `jonai-wt-ui-authoring` worktree and breaks if that worktree is deleted.
+4. Run `~/git/jonai/scripts/link.sh` from the main checkout. (Already re-run by hand on this Mac: `~/.claude/CLAUDE.md` had been importing from a jonai worktree.)
 5. README checklist: sign in to Claude Code on first run.
 
-Open questions:
-- Where the jonai local layer lives. Recommended: iCloud Drive, so it syncs and stays private. It can't go in this public repo, because `denylist` is a list of private terms (names, emails, project names). Leaving it per-machine means editing it by hand on every Mac.
-- `~/.claude/settings.json` (model, plugins, marketplaces, hooks) isn't managed by either repo, and jonai's hooks each need a manual `settings.json` edit. Proposal: jonai owns it (a change in jonai, not here). Check first whether Claude Code replaces a symlinked `settings.json` when it saves.
+Decided:
+- The jonai local layer lives in iCloud Drive (`iCloud Drive/dotfiles/jonai`), so it syncs and stays private. It can't go in this public repo, because `denylist` is a list of private terms. First step: move this Mac's `~/.config/jonai` there.
+- `~/.claude/settings.json` belongs to jonai: https://github.com/jonmilner/jonai/issues/17. Aluminium only runs `link.sh`.
+
+Open:
 - Codex: `~/.codex` exists but `codex` isn't installed. Skip unless wanted.
 - Optional: clone your other projects into `~/git` from a list.
 
