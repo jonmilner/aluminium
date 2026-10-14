@@ -16,6 +16,10 @@ defaults write com.apple.dock autohide -bool true
 echo "∙ Don't show recent applications in Dock"
 defaults write com.apple.dock show-recents -bool FALSE
 
+echo "∙ Minimize windows into their app icon, with the scale effect"
+defaults write com.apple.dock minimize-to-application -bool true
+defaults write com.apple.dock mineffect -string scale
+
 echo "∙ Fade hidden applications"
 defaults write com.apple.dock showhidden -bool true
 

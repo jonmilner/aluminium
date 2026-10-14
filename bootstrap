@@ -31,7 +31,7 @@ LINKS=(
 RETIRED_LINKS=(.gitignore .hyper.js)
 
 # Interactive steps come first (password, GitHub sign-in); the rest runs unattended.
-STEPS=(xcode homebrew github packages vite links secrets macos checklist)
+STEPS=(name xcode homebrew github packages vite links secrets macos checklist)
 
 WARNINGS=()
 
@@ -40,7 +40,7 @@ ok()   { printf '  ✓ %s\n' "$*"; }
 warn() { printf '  \033[33m! %s\033[0m\n' "$*" >&2; WARNINGS+=("$*"); }
 
 # Steps that use sudo, so they need an administrator account.
-SUDO_STEPS=" xcode homebrew packages macos "
+SUDO_STEPS=" name xcode homebrew packages macos "
 
 require_admin() {
   id -Gn | tr ' ' '\n' | grep -qx admin && return
@@ -76,6 +76,23 @@ load_brew() {
 ###############################################################################
 # Steps
 ###############################################################################
+
+# Asks once per Mac. Enter keeps the current name.
+step_name() {
+  local marker="$HOME/.local/state/aluminium/named" name host input
+  [[ -e $marker ]] && return
+  need_sudo
+  name=$(scutil --get ComputerName)
+  read -r -p "  Name for this Mac [$name]: " input || true
+  name=${input:-$name}
+  # Hostnames allow letters, digits and hyphens only.
+  host=$(printf '%s' "$name" | sed "s/[’']//g" | iconv -f utf-8 -t ascii//TRANSLIT 2>/dev/null | tr -cs 'A-Za-z0-9' '-' | sed 's/^-*//; s/-*$//')
+  sudo scutil --set ComputerName "$name"
+  sudo scutil --set LocalHostName "$host"
+  sudo scutil --set HostName "$host"
+  mkdir -p "${marker%/*}" && touch "$marker"
+  ok "This Mac is $name ($host.local)"
+}
 
 step_xcode() {
   local flag=/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress label

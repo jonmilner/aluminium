@@ -17,10 +17,11 @@ Open **Terminal** and run:
 curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/main/bootstrap | bash
 ```
 
-You'll be asked for two things, both in the first minute:
+You'll be asked for three things, all in the first minute:
 
 1. **Your Mac password**, once. It installs the Command Line Tools and Homebrew.
-2. **GitHub sign-in.** Press Enter, then approve the one-time code in your browser. This uploads the new Mac's SSH key and lets the script clone private repos.
+2. **A name for this Mac.** Press Enter to keep the current one. Asked once per Mac.
+3. **GitHub sign-in.** Press Enter, then approve the one-time code in your browser. This uploads the new Mac's SSH key and lets the script clone private repos.
 
 After that it runs unattended: apps and tools, Vite+, dotfile links, secrets and macOS settings. It clones this repo to `~/aluminium` (set `$ALUMINIUM_DIR` to change that). If macOS asks whether Terminal may access iCloud Drive, allow it.
 
@@ -58,7 +59,7 @@ cd ~/aluminium && git pull && ./bootstrap
 
 ### Steps
 
-Run single steps by name, e.g. `./bootstrap links github`. Steps, in order: `xcode`, `homebrew`, `github`, `packages`, `vite`, `links`, `secrets`, `macos`, `checklist`.
+Run single steps by name, e.g. `./bootstrap links github`. Steps, in order: `name`, `xcode`, `homebrew`, `github`, `packages`, `vite`, `links`, `secrets`, `macos`, `checklist`.
 
 ## Testing
 
