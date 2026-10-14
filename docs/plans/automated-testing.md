@@ -31,8 +31,8 @@ scripts/test e2e --keep --gui     # keep the VM and show its screen, for debuggi
 
 ## Facts that shape the design
 
-- **No `tart exec` on vanilla images.** It needs the Tart Guest Agent, which only the non-vanilla images include, and those come with Homebrew and other tools preinstalled, so they aren't "fresh". The harness has to use **SSH**. Vanilla images log in as `admin` / `admin`, with SSH on and password login allowed (checked 2026-10-14 on 26.6.2: boots without a window in about 7 s, port 22 open about 5 s later).
-- **Password for SSH:** use `SSH_ASKPASS` with `SSH_ASKPASS_REQUIRE=force` to install a key once, then use key auth. `bootstrap`'s `new_ssh_key` already uses this trick. `expect` ships with macOS as a fallback.
+- **`tart exec` needs the Tart Guest Agent**, which vanilla images don't include (the non-vanilla images do, but they come with Homebrew and other tools, so they aren't "fresh"). `scripts/test-vm` already installs the agent from its pinned GitHub release into `/usr/local/bin` over SSH, leaving Homebrew uninstalled. Checked 2026-10-14: after that, `tart exec` works, and the agent also provides clipboard sharing. So the harness needs SSH (`admin` / `admin`) only for that first install, then can use `tart exec`. Vanilla images have SSH on with password login allowed, boot without a window in about 7 s, and log `admin` in automatically.
+- **Password for SSH:** `SSH_ASKPASS` with `SSH_ASKPASS_REQUIRE=force`, as in `scripts/test-vm` and `bootstrap`'s `new_ssh_key`.
 - **Sharing the working tree:** `tart run --dir name:path[:ro]` exposes a host folder to the guest, so `--local` can test uncommitted changes. The guest path is likely `/Volumes/My Shared Files/<name>` *(unverified)*.
 - **No screen:** `tart run --no-graphics`, then `tart ip <vm> --wait 120`.
 - **Clones are cheap:** `tart clone` is a copy-on-write copy of the pulled image, so a fresh VM per run costs seconds. Each image is about 25–50 GB on disk, downloaded once per version.
@@ -44,7 +44,7 @@ scripts/test e2e --keep --gui     # keep the VM and show its screen, for debuggi
 1. **`ALUMINIUM_REF`:** in `curl` mode, clone that branch (`git clone --branch`) so a branch can be tested before it merges: `curl …/aluminium/<ref>/bootstrap | ALUMINIUM_REF=<ref> bash`.
 2. **Unattended mode** (`ALUMINIUM_NONINTERACTIVE=1`): never prompt. The `github` step uses `GH_TOKEN` if set and otherwise skips with a warning. `need_sudo` uses `sudo -n` and fails clearly if that doesn't work.
 3. **Machine-readable result:** if `ALUMINIUM_REPORT=<file>` is set, write one line per warning there, so the harness doesn't parse coloured output.
-4. **Keychain over SSH:** `ssh-add --apple-use-keychain` may fail in an SSH session because the login keychain is locked *(unverified)*. The harness can run `security unlock-keychain -p admin` first. `bootstrap` itself shouldn't need to change for this.
+4. **Keychain:** commands from `tart exec` run under the guest agent in admin's login session, so the login keychain should be unlocked and `ssh-add --apple-use-keychain` should work *(unverified)*. If not, the harness runs `security unlock-keychain -p admin` first.
 
 ## Test layers
 
@@ -69,8 +69,8 @@ On the host:
 1. Make sure Tart is installed. If not, download the release, check its checksum and that it's notarized (`spctl -a -t exec`), then install it to `~/Applications`.
 2. `tart pull` the image for `--macos` (map `15` to sequoia and `26` to tahoe, with `--image` for anything else).
 3. `tart clone <image> aluminium-test-<timestamp>`, then `tart run --no-graphics` (plus `--dir` for `--local`), then wait for the IP and SSH.
-4. Install an SSH key, give `admin` passwordless sudo through `/etc/sudoers.d/` (stands in for the password prompt), and unlock the keychain.
-5. Run `bootstrap` over SSH: either the `curl` command with `ALUMINIUM_REF`, or `./bootstrap` from the shared folder. Pass `ALUMINIUM_NONINTERACTIVE=1` and `ALUMINIUM_REPORT`. Save all output to `test/logs/<timestamp>/` (gitignored).
+4. Install the guest agent (reuse `scripts/test-vm`'s code), give `admin` passwordless sudo through `/etc/sudoers.d/` (stands in for the password prompt), and unlock the keychain.
+5. Run `bootstrap` with `tart exec`: either the `curl` command with `ALUMINIUM_REF`, or `./bootstrap` from the shared folder. Pass `ALUMINIUM_NONINTERACTIVE=1` and `ALUMINIUM_REPORT`. Save all output to `test/logs/<timestamp>/` (gitignored).
 6. Run `test/assert.sh` inside the VM, then **run `bootstrap` a second time** and assert it changed nothing.
 7. Copy the logs out, `tart stop`, and `tart delete` (unless `--keep`). Exit non-zero on any failure.
 
@@ -88,7 +88,7 @@ On the host:
 ### 3. Optional scenarios (flags)
 
 - **`--with-github`:** pass `GH_TOKEN` into the VM so the `github` step runs for real: key upload, `ssh -T git@github.com`, remote switched to SSH. Teardown deletes the VM's key from GitHub using its title. Needs a token with the `admin:public_key` scope. **Open question:** the user's own account (a key is added and removed each run) or a separate test account?
-- **`--existing-mac`:** before running `bootstrap`, seed the VM with a hand-installed app (e.g. copy VLC from its disk image), an old `~/.zshrc` and an old `~/.gitconfig`. Then assert adoption, backups and the App Management message. Over SSH the process macOS checks for App Management is `sshd`, not Terminal, so results may differ from a real terminal *(unverified)*.
+- **`--existing-mac`:** before running `bootstrap`, seed the VM with a hand-installed app (e.g. copy VLC from its disk image), an old `~/.zshrc` and an old `~/.gitconfig`. Then assert adoption, backups and the App Management message. Under `tart exec`, the process macOS checks for App Management is the guest agent, not Terminal, so results may differ from a real terminal *(unverified)*.
 
 ### 4. CI (later, optional)
 
