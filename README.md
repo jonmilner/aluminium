@@ -4,15 +4,38 @@ Sets up a Mac, or re-syncs one, with a single script.
 
 ## New Mac
 
-1. Sign in to iCloud (with iCloud Drive on).
-2. Open Terminal and run:
+### Before you start
 
-   ```sh
-   curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/main/bootstrap | bash
-   ```
+- Finish macOS Setup Assistant and sign in with your Apple Account. This turns on iCloud Drive, which holds your secrets file.
 
-   This installs the Command Line Tools, clones the repo to `~/aluminium` (or `$ALUMINIUM_DIR`), and runs `bootstrap`.
-3. Work through the checklist it prints at the end.
+### Run it
+
+Open **Terminal** and run:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/main/bootstrap | bash
+```
+
+You'll be asked for two things, both in the first minute:
+
+1. **Your Mac password**, once. It installs the Command Line Tools and Homebrew.
+2. **GitHub sign-in.** Press Enter, then approve the one-time code in your browser. This uploads the new Mac's SSH key and lets the script clone private repos.
+
+After that it runs unattended: apps and tools, Vite+, dotfile links and secrets. It clones this repo to `~/aluminium` (set `$ALUMINIUM_DIR` to change that). If macOS asks whether Terminal may access iCloud Drive, allow it.
+
+### After it finishes
+
+`bootstrap` prints this list at the end:
+
+<!-- checklist:start -->
+- [ ] Quit Terminal and use Ghostty from now on.
+- [ ] Sign in to 1Password, Chrome, Claude and GitHub Desktop.
+- [ ] VS Code: turn on Settings Sync (Accounts menu, bottom left) to restore settings and extensions.
+- [ ] Raycast: import settings (Settings → Advanced → Import).
+- [ ] Raycast and Bartender: grant Accessibility (and Screen Recording for Bartender) when they ask.
+- [ ] Bartender: enter your license.
+- [ ] First Mac only: create `iCloud Drive/dotfiles/secrets.zsh` with your tokens as `export` lines (e.g. `NPM_TOKEN_JONMILNER`).
+<!-- checklist:end -->
 
 ## Existing Mac
 
@@ -20,18 +43,19 @@ Sets up a Mac, or re-syncs one, with a single script.
 cd ~/aluminium && git pull && ./bootstrap
 ```
 
-### First run on an existing Mac
+### One-time setup on an existing Mac
 
-`bootstrap` moves your current `~/.zshrc` and other dotfiles to `*.backup-<date>` files. Once the new shell works, these are safe to remove:
+- **App Management permission.** `bootstrap` can't take over apps you installed by hand until your terminal is allowed to modify apps. Turn on your terminal (e.g. Ghostty) in System Settings → Privacy & Security → App Management, quit and reopen it, then run `./bootstrap packages`. `bootstrap` checks for this and opens the setting if it's off. Homebrew also needs this permission later to update apps.
+- **Old files.** The first run moves your current `~/.zshrc` and other dotfiles to `*.backup-<date>` files. Once the new shell works, these are safe to remove, along with tools Aluminium no longer uses:
 
-```sh
-rm -rf ~/.oh-my-zsh ~/.zsh/pure ~/Library/pnpm ~/aluminium/dotfiles
-brew uninstall fnm
-```
+  ```sh
+  rm -rf ~/.oh-my-zsh ~/.zsh/pure ~/Library/pnpm ~/aluminium/dotfiles
+  brew uninstall fnm
+  ```
 
 ### Steps
 
-Run single steps by name, e.g. `./bootstrap links ssh`. Steps: `xcode`, `homebrew`, `packages`, `vite`, `links`, `ssh`, `secrets`, `macos`, `checklist`. `macos` only runs when named, until its scripts are refreshed.
+Run single steps by name, e.g. `./bootstrap links github`. Steps, in order: `xcode`, `homebrew`, `github`, `packages`, `vite`, `links`, `secrets`, `macos`, `checklist`. `macos` only runs when named, until its scripts are refreshed.
 
 ## Layout
 

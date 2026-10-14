@@ -59,12 +59,36 @@ Ready to merge after phase 3. See "First run on an existing Mac" in the README.
 - Rebuild the Dock with `dockutil` from a list of apps that are actually installed.
 - Drop the Simulator symlink unless full Xcode is in the Brewfile.
 
-### 5. Remaining manual steps
-A short README checklist of what can't be automated. Before running `bootstrap`: sign in to iCloud (with iCloud Drive on) and the App Store. After: 1Password/Passwords sign-in, Full Disk Access and Accessibility permissions, app licenses, Raycast settings import.
+### 5. New-Mac experience and manual steps
+Target: finish Setup Assistant, open Terminal, paste one command, answer two prompts in the first minute, walk away.
+- [x] Command Line Tools install silently via `softwareupdate` (GUI dialog only as a fallback).
+- [x] SSH key gets a random passphrase stored straight in Keychain. No passphrase prompt.
+- [x] `github` step (was `ssh`) runs before `packages`, installs `gh` itself, and asks for the key-upload scope at sign-in, so there's one browser approval, not two.
+- [x] `packages` checks App Management permission before adopting hand-installed apps (existing Macs only).
+- [x] Every manual step is in the README (before, during, after, existing-Mac only). `bootstrap` prints the "after" checklist from the README, so there's one copy.
+- [ ] Verify on a fresh Mac or a new macOS user account: the `softwareupdate` label parsing, whether the Vite+ installer still prompts with `VP_NODE_MANAGER=yes`, and whether macOS asks before Terminal touches iCloud Drive.
+- [ ] Phase 4 adds any permissions the defaults scripts need (e.g. Full Disk Access for Terminal) to the README.
+- [ ] Optional: Touch ID for `sudo` (`/etc/pam.d/sudo_local`), so the password prompt becomes a fingerprint on later runs.
 
 ### 6. Prevent drift
 - `bootstrap --check`: report unlinked or modified files and Brewfile differences without changing anything.
 - ShellCheck in a pre-commit hook or GitHub Action.
+
+### 7. Agents: Claude Code and jonai
+Goal: a new Mac comes out of `bootstrap` with Claude Code and the jonai skills, agents, hooks and instructions installed, with no extra commands.
+
+Proposed `agents` step, after `github` (jonai is private, so cloning needs the SSH key) and `secrets`:
+1. Install Claude Code with its native installer if `claude` is missing (matches this Mac: `~/.local/bin/claude`, which updates itself).
+2. Clone `jonmilner/jonai` to `~/git/jonai` over SSH if it isn't there.
+3. Link `~/.config/jonai` (jonai's local layer: personal `AGENTS.md` and `denylist`) to `iCloud Drive/dotfiles/jonai`. This must happen before step 4, or `link.sh` creates a fresh layer from `local.example`.
+4. Run `~/git/jonai/scripts/link.sh` from the main checkout. This also fixes this Mac's `~/.claude/CLAUDE.md`, which imports from the `jonai-wt-ui-authoring` worktree and breaks if that worktree is deleted.
+5. README checklist: sign in to Claude Code on first run.
+
+Open questions:
+- Where the jonai local layer lives. Recommended: iCloud Drive, so it syncs and stays private. It can't go in this public repo, because `denylist` is a list of private terms (names, emails, project names). Leaving it per-machine means editing it by hand on every Mac.
+- `~/.claude/settings.json` (model, plugins, marketplaces, hooks) isn't managed by either repo, and jonai's hooks each need a manual `settings.json` edit. Proposal: jonai owns it (a change in jonai, not here). Check first whether Claude Code replaces a symlinked `settings.json` when it saves.
+- Codex: `~/.codex` exists but `codex` isn't installed. Skip unless wanted.
+- Optional: clone your other projects into `~/git` from a list.
 
 ## Known bugs in the current scripts
 Fixed by the rewrite. Listed so none come back:

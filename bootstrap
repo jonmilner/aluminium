@@ -2,7 +2,7 @@
 # Set up a new Mac, or re-sync an existing one. Safe to re-run.
 #
 #   ./bootstrap               run the default steps
-#   ./bootstrap links ssh     run only the named steps
+#   ./bootstrap links github  run only the named steps
 #
 # New Mac (clones to ~/aluminium, or $ALUMINIUM_DIR):
 #   curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/main/bootstrap | bash
@@ -28,9 +28,10 @@ LINKS=(
 # Links from older layouts, removed if still present
 RETIRED_LINKS=(.gitignore .hyper.js)
 
+# Interactive steps come first (password, GitHub sign-in); the rest runs unattended.
 # `macos` runs only when named until its scripts are refreshed (PLAN.md phase 4).
-DEFAULT_STEPS=(xcode homebrew packages vite links ssh secrets checklist)
-ALL_STEPS=(xcode homebrew packages vite links ssh secrets macos checklist)
+DEFAULT_STEPS=(xcode homebrew github packages vite links secrets checklist)
+ALL_STEPS=(xcode homebrew github packages vite links secrets macos checklist)
 
 WARNINGS=()
 
@@ -42,7 +43,7 @@ need_sudo() {
   [[ -n $SUDO_KEEPALIVE ]] && return
   sudo -v
   while true; do sudo -n true; sleep 50; kill -0 "$$" || exit; done 2>/dev/null &
-  SUDO_KEEPALIVE=$!
+  export SUDO_KEEPALIVE=$!
   trap 'kill $SUDO_KEEPALIVE 2>/dev/null' EXIT
 }
 
@@ -59,13 +60,25 @@ load_brew() {
 ###############################################################################
 
 step_xcode() {
+  local flag=/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress label
   if xcode-select -p >/dev/null 2>&1; then
     ok "Command Line Tools installed"
     return
   fi
-  xcode-select --install >/dev/null 2>&1 || true
-  echo "  Finish the Command Line Tools installer window. Waiting…"
-  until xcode-select -p >/dev/null 2>&1; do sleep 5; done
+  need_sudo
+  # Install without the GUI dialog, the same way Homebrew's installer does.
+  touch "$flag"
+  label=$(softwareupdate -l 2>/dev/null | sed -n 's/^ *\* Label: //p' | grep 'Command Line Tools' | sort -V | tail -n 1)
+  if [[ -n $label ]]; then
+    echo "  Installing $label. This takes several minutes…"
+    sudo softwareupdate -i "$label"
+  fi
+  rm -f "$flag"
+  if ! xcode-select -p >/dev/null 2>&1; then
+    xcode-select --install >/dev/null 2>&1 || true
+    echo "  Finish the Command Line Tools installer window. Waiting…"
+    until xcode-select -p >/dev/null 2>&1; do sleep 5; done
+  fi
   ok "Command Line Tools installed"
 }
 
@@ -80,8 +93,27 @@ step_homebrew() {
   ok "Homebrew installed"
 }
 
+# Adopting a hand-installed app means changing its bundle, which macOS blocks
+# unless the terminal has App Management permission. Probe one app we own
+# (not the terminal itself, which may always modify its own bundle).
+can_modify_apps() {
+  local app
+  for app in /Applications/*.app; do
+    [[ -O $app ]] || continue
+    [[ $(defaults read "$app/Contents/Info" CFBundleIdentifier 2>/dev/null) == "$__CFBundleIdentifier" ]] && continue
+    chgrp "$(stat -f %g "$app")" "$app" 2>/dev/null
+    return
+  done
+  return 0
+}
+
 step_packages() {
   load_brew || { warn "Homebrew missing; run: ./bootstrap homebrew"; return; }
+  if ! can_modify_apps; then
+    warn "This terminal can't take over apps installed by hand. Turn it on in System Settings → Privacy & Security → App Management, quit and reopen the terminal, then run: ./bootstrap packages"
+    open "x-apple.systempreferences:com.apple.preference.security?Privacy_AppBundles" 2>/dev/null || true
+    return
+  fi
   need_sudo
   # Casks adopt apps that were installed by hand.
   brew bundle --file="$REPO/Brewfile" || warn "brew bundle reported failures (see above)"
@@ -129,21 +161,38 @@ step_links() {
   done
 }
 
-step_ssh() {
+# The key gets a random passphrase that goes straight into Keychain: it's
+# encrypted on disk, and nobody has to type or remember the passphrase.
+new_ssh_key() {
+  local key=$1 askpass
+  SSH_KEY_PASSPHRASE=$(openssl rand -base64 33)
+  export SSH_KEY_PASSPHRASE
+  ssh-keygen -q -t ed25519 -C "$(id -un)@$(scutil --get LocalHostName)" -f "$key" -N "$SSH_KEY_PASSPHRASE"
+  askpass=$(mktemp)
+  printf '#!/bin/sh\nprintf "%%s\\n" "$SSH_KEY_PASSPHRASE"\n' >"$askpass"
+  chmod 700 "$askpass"
+  SSH_ASKPASS=$askpass SSH_ASKPASS_REQUIRE=force ssh-add --apple-use-keychain "$key" </dev/null 2>/dev/null
+  rm -f "$askpass"
+  unset SSH_KEY_PASSPHRASE
+}
+
+step_github() {
   local key="$HOME/.ssh/id_ed25519" pub keys url
-  if [[ ! -f $key ]]; then
-    echo "  Creating an SSH key for this Mac. Pick a passphrase; Keychain will remember it."
-    ssh-keygen -q -t ed25519 -C "$(id -un)@$(scutil --get LocalHostName)" -f "$key"
+  mkdir -p -m 700 "$HOME/.ssh"
+  if [[ -f $key ]]; then
+    ssh-add --apple-use-keychain "$key" 2>/dev/null
+  else
+    new_ssh_key "$key"
   fi
-  ssh-add --apple-use-keychain "$key" 2>/dev/null
   ok "SSH key in Keychain"
 
   if ! command -v gh >/dev/null 2>&1; then
-    warn "gh missing; run: ./bootstrap packages ssh"
-    return
+    load_brew || { warn "Homebrew missing; run: ./bootstrap homebrew github"; return; }
+    brew install --quiet gh
   fi
   if ! gh auth status >/dev/null 2>&1; then
-    gh auth login --hostname github.com --git-protocol ssh --web --skip-ssh-key
+    echo "  Sign in to GitHub in your browser. This is the last prompt; the rest runs unattended."
+    gh auth login --hostname github.com --git-protocol ssh --web --skip-ssh-key --scopes admin:public_key
   fi
 
   pub=$(cut -d' ' -f2 "$key.pub")
@@ -193,16 +242,10 @@ step_macos() {
   ok "macOS defaults applied"
 }
 
+# Prints the "After it finishes" list from the README, so there's one copy.
 step_checklist() {
-  cat <<'EOF'
-  Manual steps (once per Mac):
-  [ ] Sign in to 1Password and Passwords
-  [ ] Raycast: import settings (Settings → Advanced → Import)
-  [ ] Grant permissions when apps ask: Raycast and Bartender (Accessibility,
-      Screen Recording)
-  [ ] Bartender: enter license
-  [ ] Open a new terminal window to load the shell config
-EOF
+  echo "  Left to do (from README.md):"
+  sed -n '/<!-- checklist:start -->/,/<!-- checklist:end -->/{/<!--/d;p;}' "$REPO/README.md" | sed 's/^/  /'
 }
 
 ###############################################################################
