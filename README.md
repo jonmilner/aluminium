@@ -30,6 +30,7 @@ After that it runs unattended: apps and tools, Vite+, dotfile links, secrets and
 
 <!-- checklist:start -->
 - [ ] Quit Terminal and use Ghostty from now on.
+- [ ] Ghostty: turn it on in System Settings → Privacy & Security → Full Disk Access, reopen it, then run `~/aluminium/bootstrap macos`. This applies the Safari settings, which macOS keeps out of reach of apps without that permission.
 - [ ] Sign in to 1Password, Chrome, Claude and GitHub Desktop.
 - [ ] VS Code: turn on Settings Sync (Accounts menu, bottom left) to restore settings and extensions.
 - [ ] Raycast: import settings (Settings → Advanced → Import).
@@ -47,6 +48,7 @@ cd ~/aluminium && git pull && ./bootstrap
 ### One-time setup on an existing Mac
 
 - **App Management permission.** `bootstrap` can't take over apps you installed by hand until your terminal is allowed to modify apps. Turn on your terminal (e.g. Ghostty) in System Settings → Privacy & Security → App Management, quit and reopen it, then run `./bootstrap packages`. `bootstrap` checks for this and opens the setting if it's off. Homebrew also needs this permission later to update apps.
+- **Full Disk Access.** Safari's settings need it. Turn on your terminal in System Settings → Privacy & Security → Full Disk Access, quit and reopen it, then run `./bootstrap macos`. `bootstrap` warns and opens the setting if it's off.
 - **Old files.** The first run moves your current `~/.zshrc` and other dotfiles to `*.backup-<date>` files. Once the new shell works, these are safe to remove, along with tools Aluminium no longer uses:
 
   ```sh
