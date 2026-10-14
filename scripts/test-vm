@@ -5,26 +5,106 @@
 #   scripts/test-vm            macOS 26.6.2
 #   scripts/test-vm 15.7.7     another version (15.x = Sequoia, 26.x = Tahoe)
 #
-# In the VM, log in as admin (password: admin), open Terminal and run:
+# Once the VM boots, this installs the Tart guest agent so copy and paste work
+# between this Mac and the VM. Homebrew stays uninstalled, so bootstrap still
+# starts from a clean Mac.
+#
+# In the VM (user admin, password admin), open Terminal and paste:
 #   curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/main/bootstrap | bash
 # To test a branch, use its name in place of `main` in the URL, and run
 #   ... | ALUMINIUM_REF=<branch> bash
+#
+# ALUMINIUM_VM=<name> picks another VM name; ALUMINIUM_VM_HEADLESS=1 hides the window.
 
 set -euo pipefail
 
 version=${1:-26.6.2}
+vm=${ALUMINIUM_VM:-aluminium-test}
 case $version in
   15.*) codename=sequoia ;;
   26.*) codename=tahoe ;;
   *) echo "Unknown macOS version: $version" >&2; exit 1 ;;
 esac
 
+# Tart guest agent release, pinned with its checksum
+AGENT_VERSION=0.15.0
+AGENT_SHA256=eb47f402f18e742a8ea96344115ca776179f9c4c67494bc0c46a10a68db280b7
+
 if ! command -v tart >/dev/null 2>&1; then
   echo "Tart isn't installed. See docs/plans/automated-testing.md." >&2
   exit 1
 fi
 
-vm=aluminium-test
 tart delete "$vm" 2>/dev/null || true
 tart clone "ghcr.io/cirruslabs/macos-$codename-vanilla:$version" "$vm"
-tart run "$vm"
+
+run_args=()
+[[ -n ${ALUMINIUM_VM_HEADLESS:-} ]] && run_args=(--no-graphics)
+tart run ${run_args[@]+"${run_args[@]}"} "$vm" &
+run_pid=$!
+
+ip=$(tart ip "$vm" --wait 120)
+
+# Log in over SSH with the image's default password.
+askpass=$(mktemp)
+trap 'rm -f "$askpass"' EXIT
+printf '#!/bin/sh\necho admin\n' >"$askpass"
+chmod 700 "$askpass"
+vm_ssh() {
+  SSH_ASKPASS=$askpass SSH_ASKPASS_REQUIRE=force ssh -q \
+    -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+    -o PubkeyAuthentication=no -o PreferredAuthentications=keyboard-interactive,password \
+    -o ConnectTimeout=5 "admin@$ip" "$@"
+}
+for _ in $(seq 1 30); do
+  vm_ssh true </dev/null 2>/dev/null && break
+  sleep 2
+done
+
+echo "Installing the Tart guest agent for copy and paste…"
+vm_ssh /bin/bash -s "$AGENT_VERSION" "$AGENT_SHA256" <<'EOF'
+set -euo pipefail
+version=$1 sha=$2
+as_root() { printf 'admin\n' | sudo -S -p '' "$@"; }
+cd "$(mktemp -d)"
+curl -fsSL -o agent.tgz "https://github.com/cirruslabs/tart-guest-agent/releases/download/v$version/tart-guest-agent-darwin-all.tar.gz"
+echo "$sha  agent.tgz" | shasum -a 256 -c - >/dev/null
+tar -xzf agent.tgz tart-guest-agent
+as_root mkdir -p /usr/local/bin
+as_root install -m 755 tart-guest-agent /usr/local/bin/tart-guest-agent
+
+# A global launch agent runs in the logged-in user's session, which clipboard
+# sharing needs. Based on cirruslabs/macos-image-templates data/tart-guest-agent.plist.
+cat >agent.plist <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>org.cirruslabs.tart-guest-agent</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/local/bin/tart-guest-agent</string>
+    <string>--run-agent</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/tmp/tart-guest-agent.log</string>
+  <key>StandardErrorPath</key><string>/tmp/tart-guest-agent.log</string>
+</dict>
+</plist>
+PLIST
+plist=/Library/LaunchAgents/org.cirruslabs.tart-guest-agent.plist
+as_root install -m 644 -o root -g wheel agent.plist "$plist"
+
+# Start it in the current login session; later logins start it automatically.
+as_root launchctl bootstrap "gui/$(id -u)" "$plist" 2>/dev/null || true
+EOF
+
+if vm_ssh pgrep -q tart-guest-agent </dev/null; then
+  echo "Copy and paste between this Mac and the VM is ready."
+else
+  echo "The guest agent isn't running yet; it starts when admin logs in." >&2
+fi
+
+echo "VM '$vm' is running. Closing its window (or Ctrl-C) stops it."
+wait "$run_pid"
