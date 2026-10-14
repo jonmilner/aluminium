@@ -282,7 +282,7 @@ step_macos() {
   fi
   # Applies keyboard shortcut changes without logging out.
   /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u 2>/dev/null || true
-  killall Dock Finder SystemUIServer ControlCenter 2>/dev/null || true
+  killall Dock Finder SystemUIServer ControlCenter Spotlight 2>/dev/null || true
   ok "macOS defaults applied"
 }
 

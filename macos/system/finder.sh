@@ -146,32 +146,49 @@ rm -f "$finder_plist"
 echo "∙ Sidebar favorites and locations"
 /usr/bin/python3 -I "$dir/lib/finder-sidebar.py"
 
-# Per-folder views. Finder keeps these itself (in .DS_Store, or elsewhere for
-# iCloud folders), so they're set through Finder. The first run asks to let
-# the terminal control Finder.
-# finder_list_view <folder> <name|modified> <normal|reversed>
-finder_list_view() {
+# Per-folder views. Finder remembers each folder's last view, and treats a view
+# change in any window as the new default for all folders. So: forget the
+# remembered views, set the exceptions, then set the defaults again. The first
+# run asks to let the terminal control Finder.
+echo "∙ Forget per-folder views Finder remembered"
+"$dir/lib/finder-reset.sh"
+
+# finder_view <folder> column
+# finder_view <folder> list <name|modified> <normal|reversed>
+finder_view() {
   [[ -d $1 ]] || return 0
-  osascript - "$@" >/dev/null 2>&1 <<'APPLESCRIPT' || echo "  ! Couldn't set the view for $1. Allow this terminal to control Finder (System Settings → Privacy & Security → Automation), then run: ./bootstrap macos"
-on run {folderPath, sortBy, direction}
+  osascript - "$1" "$2" "${3:-name}" "${4:-normal}" >/dev/null 2>&1 <<'APPLESCRIPT' || echo "  ! Couldn't set the view for $1. Allow this terminal to control Finder (System Settings → Privacy & Security → Automation), then run: ./bootstrap macos"
+on run {folderPath, viewName, sortBy, direction}
   with timeout of 60 seconds
     tell application "Finder"
-      open ((POSIX file folderPath) as alias)
-      delay 1
+      set f to (POSIX file folderPath) as alias
+      open f
+      -- Finder may have just relaunched: wait until the front window is this folder.
+      repeat 20 times
+        delay 0.5
+        try
+          if (target of Finder window 1 as alias) as text is f as text then exit repeat
+        end try
+      end repeat
       set w to Finder window 1
-      set current view of w to list view
-      set opts to list view options of w
-      if sortBy is "modified" then
-        set sort column of opts to modification date column
-        set c to column id modification date column of opts
+      if (target of w as alias) as text is not f as text then error "window didn't open"
+      if viewName is "column" then
+        set current view of w to column view
       else
-        set sort column of opts to name column
-        set c to column id name column of opts
-      end if
-      if direction is "reversed" then
-        set sort direction of c to reversed
-      else
-        set sort direction of c to normal
+        set current view of w to list view
+        set opts to list view options of w
+        if sortBy is "modified" then
+          set sort column of opts to modification date column
+          set c to column id modification date column of opts
+        else
+          set sort column of opts to name column
+          set c to column id name column of opts
+        end if
+        if direction is "reversed" then
+          set sort direction of c to reversed
+        else
+          set sort direction of c to normal
+        end if
       end if
       close w
     end tell
@@ -180,8 +197,16 @@ end run
 APPLESCRIPT
 }
 
+echo "∙ Downloads: column view (macOS defaults it to list view)"
+finder_view "$HOME/Downloads" column
+
 echo "∙ Screenshots: list view, newest first"
-finder_list_view "$HOME/Library/Mobile Documents/com~apple~CloudDocs/Screenshots" modified reversed
+finder_view "$HOME/Library/Mobile Documents/com~apple~CloudDocs/Screenshots" list modified reversed
 
 echo "∙ Applications: list view, by name"
-finder_list_view /Applications name normal
+finder_view /Applications list name normal
+
+echo "∙ Default view again (the views above changed it)"
+defaults write com.apple.finder FXPreferredViewStyle -string clmv
+defaults write com.apple.finder FXPreferredGroupBy -string "Kind"
+defaults write com.apple.finder FXArrangeGroupViewBy -string "Name"

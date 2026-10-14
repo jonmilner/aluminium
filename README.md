@@ -59,7 +59,7 @@ cd ~/aluminium && git pull && ./bootstrap
 
 ### Steps
 
-Run single steps by name, e.g. `./bootstrap links github`. Steps, in order: `name`, `xcode`, `homebrew`, `github`, `packages`, `vite`, `links`, `secrets`, `macos`, `checklist`.
+Run single steps by name, e.g. `./bootstrap links github`. `./bootstrap macos` also makes Finder forget per-folder views you changed by hand. Steps, in order: `name`, `xcode`, `homebrew`, `github`, `packages`, `vite`, `links`, `secrets`, `macos`, `checklist`.
 
 ## Testing
 
