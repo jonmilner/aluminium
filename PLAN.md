@@ -11,7 +11,9 @@ Goal: clone this repo on a new Mac, run one script, and have very little manual 
 | Symlinks | A short manifest inside `bootstrap` (repo path to home path). Back up anything already there, then link. No stow or chezmoi. |
 | Shell | No oh-my-zsh. Homebrew installs `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zoxide`, `fzf` and `pure`. About 20 lines of plain zsh replace what oh-my-zsh set. |
 | Node | Vite+. Drop `fnm`. |
-| Secrets | macOS Keychain, not 1Password tooling. Per-machine ed25519 SSH key with its passphrase in Keychain, uploaded with `gh ssh-key add`. Tokens read via `security find-generic-password`. Machine-specific settings in an untracked `~/.zshrc.local`. |
+| Secrets | `secrets.zsh` in iCloud Drive (`~/Library/Mobile Documents/com~apple~CloudDocs/dotfiles/secrets.zsh`), loaded by `zshrc` if present. Never in the repo. Only end-to-end encrypted if Advanced Data Protection is on. |
+| SSH | A separate ed25519 key per machine, passphrase stored in Keychain, uploaded with `gh ssh-key add`. Not synced. |
+| Machine-specific settings | Untracked `~/.zshrc.local`. |
 | Repo location | Path-independent. Nothing hardcodes `~/aluminium`. |
 
 ## Phases
@@ -27,7 +29,8 @@ Findings:
 
 ### 1. Restructure
 - New layout: `Brewfile`, `home/` (files linked into `~`), `config/` (files linked into `~/.config`), `macos/`, `bootstrap`.
-- Delete `install/*`, `functions`, `hyper.js`, `z.sh` and `npmrc` (the npm token moves to Keychain).
+- Delete `install/*`, `functions`, `hyper.js` and `z.sh`. Keep `npmrc`: it reads `NPM_TOKEN_JONMILNER` from the environment, which `secrets.zsh` sets.
+- Remove all Dropbox references (app list, Dock, `private.zsh` line, screenshots folder).
 - Prune the Brewfile to what belongs on every machine. Machine-specific apps go in `Brewfile.local` (untracked).
 
 ### 2. Bootstrap script
@@ -37,8 +40,9 @@ In order, each step skipped if already done:
 3. `brew bundle` (plus `Brewfile.local` if present).
 4. Symlinks from the manifest, with timestamped backups.
 5. SSH key and `gh auth login`.
-6. macOS defaults, then restart Dock, Finder and SystemUIServer.
-7. Print the remaining manual checklist.
+6. Secrets: if `secrets.zsh` is in iCloud Drive but not downloaded yet, fetch it with `brctl download`. If it's missing, warn and carry on.
+7. macOS defaults, then restart Dock, Finder and SystemUIServer.
+8. Print the remaining manual checklist.
 
 Fresh machine entry point: a `curl | bash` one-liner that clones the repo and runs `bootstrap`.
 
@@ -54,7 +58,7 @@ Fresh machine entry point: a `curl | bash` one-liner that clones the repo and ru
 - Drop the Simulator symlink unless full Xcode is in the Brewfile.
 
 ### 5. Remaining manual steps
-A short README checklist of what can't be automated: App Store sign-in, iCloud, 1Password/Passwords sign-in, Full Disk Access and Accessibility permissions, app licenses, and adding tokens to Keychain.
+A short README checklist of what can't be automated. Before running `bootstrap`: sign in to iCloud (with iCloud Drive on) and the App Store. After: 1Password/Passwords sign-in, Full Disk Access and Accessibility permissions, app licenses, Raycast settings import.
 
 ### 6. Prevent drift
 - `bootstrap --check`: report unlinked or modified files and Brewfile differences without changing anything.
