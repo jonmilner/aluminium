@@ -53,3 +53,7 @@ Open the Command Palette (⇧⌘P) and type `shell command` to find the **Shell 
 ## Acknowledgements
 
 - [Formation](https://github.com/minamarkham/formation) by Mina Markham.
+
+////////
+
+ln -sfn ~/aluminium/dotfiles/ghostty.conf ~/.config/ghostty/config
