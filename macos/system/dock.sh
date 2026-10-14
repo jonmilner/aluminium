@@ -29,7 +29,9 @@ defaults write com.apple.dock showhidden -bool true
 # app you put back stays. Delete the marker file to run it again.
 dock_keep=" com.apple.finder com.apple.Safari com.apple.MobileSMS com.apple.Photos com.apple.systempreferences "
 dock_marker="$HOME/.local/state/aluminium/dock-cleaned"
-if [[ ! -e $dock_marker ]]; then
+if [[ ! -e $dock_marker ]] && ! command -v dockutil >/dev/null; then
+  echo "  ! Dock cleanup skipped: dockutil isn't installed yet. Run: ./bootstrap packages macos"
+elif [[ ! -e $dock_marker ]]; then
   echo "∙ Remove macOS default apps from the Dock (first run on this Mac)"
   dock_res=/System/Library/CoreServices/Dock.app/Contents/Resources
   docked=$(dockutil --list --no-restart 2>/dev/null | cut -f5)
@@ -53,16 +55,22 @@ fi
 dock_skip=" bartender raycast vlc "
 echo "∙ Add Brewfile apps missing from the Dock"
 docked=$(dockutil --list --no-restart 2>/dev/null | cut -f5)
+casks=()
 for brewfile in "$dir/../Brewfile" "$dir/../Brewfile.local"; do
   [[ -f $brewfile ]] || continue
   for cask in $(brew bundle list --cask --file="$brewfile"); do
-    [[ $dock_skip == *" $cask "* ]] && continue
-    app=$(brew info --cask --json=v2 "$cask" |
-      jq -r '.casks[0].artifacts[] | .app? // empty | if (.[1] | type) == "object" then .[1].target else .[0] end' | head -1)
-    path="/Applications/$app"
-    [[ -n $app && -d $path ]] || continue
-    id=$(defaults read "$path/Contents/Info" CFBundleIdentifier 2>/dev/null)
-    grep -qxF "$id" <<<"$docked" && continue
-    dockutil --add "$path" --no-restart >/dev/null && echo "  added $app"
+    [[ $dock_skip == *" $cask "* ]] || casks+=("$cask")
   done
 done
+# One brew call for every cask: each call takes a second or two.
+if (( ${#casks[@]} )); then
+  brew info --cask --json=v2 "${casks[@]}" |
+    jq -r '.casks[] | first(.artifacts[] | .app? // empty | if (.[1] | type) == "object" then .[1].target else .[0] end)' |
+    while IFS= read -r app; do
+      path="/Applications/$app"
+      [[ -d $path ]] || continue
+      id=$(defaults read "$path/Contents/Info" CFBundleIdentifier 2>/dev/null)
+      grep -qxF "$id" <<<"$docked" && continue
+      dockutil --add "$path" --no-restart >/dev/null && echo "  added $app"
+    done
+fi

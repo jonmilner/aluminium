@@ -143,15 +143,24 @@ pb_set "NSToolbar Configuration Browser:TB Size Mode" integer 1
 defaults import com.apple.finder "$finder_plist"
 rm -f "$finder_plist"
 
+# screenshots.sh runs after this file, so create its folder now for the sidebar
+# and the view below.
+mkdir -p "$HOME/Library/Mobile Documents/com~apple~CloudDocs/Screenshots"
+
 echo "∙ Sidebar favorites and locations"
 /usr/bin/python3 -I "$dir/lib/finder-sidebar.py"
 
 # Per-folder views. Finder remembers each folder's last view, and treats a view
 # change in any window as the new default for all folders. So: forget the
 # remembered views, set the exceptions, then set the defaults again. The first
-# run asks to let the terminal control Finder.
+# run asks to let the terminal control Finder. The reset reads Desktop, Documents
+# and Downloads, which without Full Disk Access stops for permission prompts.
 echo "∙ Forget per-folder views Finder remembered"
-"$dir/lib/finder-reset.sh"
+if "$dir/lib/has-full-disk-access"; then
+  "$dir/lib/finder-reset.sh"
+else
+  echo "  ! Skipped: needs Full Disk Access for this terminal"
+fi
 
 # finder_view <folder> column
 # finder_view <folder> list <name|modified> <normal|reversed>

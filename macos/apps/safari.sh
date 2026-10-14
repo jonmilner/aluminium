@@ -7,8 +7,11 @@ echo "Safari"
 # Safari is sandboxed: it reads its settings from its container, not from
 # ~/Library/Preferences. Writing there needs Full Disk Access for the terminal.
 safari="$HOME/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari"
-if ! ls "${safari%/*}" >/dev/null 2>&1; then
-  echo "  ! Skipped: Safari settings need Full Disk Access for this terminal (or open Safari once on a new Mac)"
+if ! "$dir/lib/has-full-disk-access"; then
+  echo "  ! Skipped: needs Full Disk Access for this terminal"
+  return 0
+elif [[ ! -d ${safari%/*} ]]; then
+  echo "  ! Skipped: open Safari once first"
   return 0
 fi
 # Safari overwrites its settings on quit, so close it first.

@@ -85,8 +85,11 @@ step_name() {
   name=$(scutil --get ComputerName)
   read -r -p "  Name for this Mac [$name]: " input || true
   name=${input:-$name}
-  # Hostnames allow letters, digits and hyphens only.
-  host=$(printf '%s' "$name" | sed "s/[’']//g" | iconv -f utf-8 -t ascii//TRANSLIT 2>/dev/null | tr -cs 'A-Za-z0-9' '-' | sed 's/^-*//; s/-*$//')
+  # Hostnames allow letters, digits and hyphens only. iconv turns é into 'e and
+  # drops what it can't convert; a name with nothing left keeps the current one.
+  host=$(printf '%s' "$name" | sed "s/[’']//g" | { iconv -c -f utf-8 -t ascii//TRANSLIT 2>/dev/null || true; } |
+    tr -d "\"'\`^~" | tr -cs 'A-Za-z0-9' '-' | sed 's/^-*//; s/-*$//')
+  host=${host:-$(scutil --get LocalHostName)}
   sudo scutil --set ComputerName "$name"
   sudo scutil --set LocalHostName "$host"
   sudo scutil --set HostName "$host"
@@ -275,10 +278,13 @@ step_secrets() {
 step_macos() {
   need_sudo
   bash "$REPO/macos/set-defaults.sh"
-  # Safari's settings live in its sandbox container, which needs Full Disk Access.
-  if [[ -d ~/Library/Containers/com.apple.Safari ]] && ! ls ~/Library/Containers/com.apple.Safari/Data >/dev/null 2>&1; then
-    warn "Safari settings skipped: turn on this terminal in System Settings → Privacy & Security → Full Disk Access, reopen it, then run: ./bootstrap macos"
+  # Safari's settings (in its sandbox container) and the Finder view reset need
+  # Full Disk Access. macos/apps/safari.sh and macos/system/finder.sh skip them without it.
+  if ! "$REPO/macos/lib/has-full-disk-access"; then
+    warn "Safari settings and Finder view reset skipped: turn on this terminal in System Settings → Privacy & Security → Full Disk Access, reopen it, then run: ./bootstrap macos"
     open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles" 2>/dev/null || true
+  elif [[ ! -d ~/Library/Containers/com.apple.Safari/Data/Library/Preferences ]]; then
+    warn "Safari settings skipped: open Safari once, then run: ./bootstrap macos"
   fi
   # Applies keyboard shortcut changes without logging out.
   /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u 2>/dev/null || true

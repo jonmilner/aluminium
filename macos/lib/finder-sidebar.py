@@ -73,7 +73,6 @@ for fn, res, args in [
     fn.restype, fn.argtypes = res, args
 
 SPECIAL_ID = "com.apple.LSSharedFileList.SpecialItemIdentifier"
-LAST = P(C.c_size_t.in_dll(cs, "kLSSharedFileListItemLast").value)
 NO_UI = 3  # kLSSharedFileListNoUserInteraction | kLSSharedFileListDoNotMountVolumes
 
 
