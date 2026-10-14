@@ -30,7 +30,7 @@ Findings:
 ### 1. Restructure
 - New layout: `Brewfile`, `home/` (files linked into `~`), `config/` (files linked into `~/.config`), `macos/`, `bootstrap`.
 - Delete `install/*`, `functions`, `hyper.js` and `z.sh`. Keep `npmrc`: it reads `NPM_TOKEN_JONMILNER` from the environment, which `secrets.zsh` sets.
-- Remove all Dropbox references (app list, Dock, `private.zsh` line, screenshots folder).
+- Remove all Dropbox references (app list, Dock, `private.zsh` line). Screenshots now go to `iCloud Drive/Screenshots`.
 - Prune the Brewfile to what belongs on every machine. Machine-specific apps go in `Brewfile.local` (untracked).
 
 ### 2. Bootstrap script

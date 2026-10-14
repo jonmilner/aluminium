@@ -5,7 +5,9 @@ echo "Screenshots"
 ###############################################################################
 
 echo "∙ Screenshot location"
-defaults write com.apple.screencapture location ~/Dropbox/Screenshots 
+screenshots="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Screenshots"
+mkdir -p "$screenshots"
+defaults write com.apple.screencapture location -string "$screenshots"
 
 echo "∙ Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)"
 defaults write com.apple.screencapture type -string "png"
