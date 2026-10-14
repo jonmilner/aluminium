@@ -13,7 +13,6 @@ brew "mas"
 # Terminal & editors
 cask "ghostty"
 cask "visual-studio-code"
-cask "zed"          # not currently installed; config exists
 cask "github"
 
 # Browsers

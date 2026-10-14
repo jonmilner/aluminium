@@ -18,14 +18,12 @@ Goal: clone this repo on a new Mac, run one script, and have very little manual 
 
 ### 0. Save current state
 - [x] Commit pending local changes.
-- [x] Bring the live `~/.zshrc` (pnpm, Vite+, `flatten-movies`) and Zed settings into the repo. Ghostty was already there.
+- [x] Bring the live `~/.zshrc` (pnpm, Vite+, `flatten-movies`) into the repo. Ghostty was already there.
 - [x] Record the real inventory in a draft `Brewfile`.
 
 Findings:
 - Raycast keeps no settings in `~/.config`. Use its built-in export/import (manual step).
 - VS Code Settings Sync already covers its settings and extensions, so they stay out of the Brewfile.
-- Zed has a config but isn't installed. Keep it or drop it in phase 1.
-- Zed settings still set `FIG_NEW_SESSION`, left over from Fig. Remove it.
 
 ### 1. Restructure
 - New layout: `Brewfile`, `home/` (files linked into `~`), `config/` (files linked into `~/.config`), `macos/`, `bootstrap`.
