@@ -14,12 +14,29 @@
 # To test a branch, use its name in place of `main` in the URL, and run
 #   ... | ALUMINIUM_REF=<branch> bash
 #
-# ALUMINIUM_VM=<name> picks another VM name; ALUMINIUM_VM_HEADLESS=1 hides the window.
+# Closing the VM window or pressing Ctrl-C stops the VM and deletes it.
+#
+#   scripts/test-vm --clean    remove a leftover VM (e.g. after a crash)
+#
+# ALUMINIUM_VM=<name> picks another VM name, ALUMINIUM_VM_HEADLESS=1 hides the
+# window, and ALUMINIUM_VM_KEEP=1 keeps the VM after it stops.
 
 set -euo pipefail
 
-version=${1:-26.6.2}
 vm=${ALUMINIUM_VM:-aluminium-test}
+
+remove_vm() {
+  tart stop "$vm" >/dev/null 2>&1 || true
+  tart delete "$vm" >/dev/null 2>&1 || true
+}
+
+if [[ ${1:-} == --clean ]]; then
+  remove_vm
+  echo "Removed VM '$vm' (if it existed)."
+  exit 0
+fi
+
+version=${1:-26.6.2}
 case $version in
   15.*) codename=sequoia ;;
   26.*) codename=tahoe ;;
@@ -35,8 +52,22 @@ if ! command -v tart >/dev/null 2>&1; then
   exit 1
 fi
 
-tart delete "$vm" 2>/dev/null || true
+remove_vm
 tart clone "ghcr.io/cirruslabs/macos-$codename-vanilla:$version" "$vm"
+
+askpass=$(mktemp)
+cleanup() {
+  trap - EXIT INT TERM HUP
+  rm -f "$askpass"
+  if [[ -n ${ALUMINIUM_VM_KEEP:-} ]]; then
+    echo "Kept VM '$vm'. Remove it with: scripts/test-vm --clean"
+  else
+    echo "Removing VM '$vm'…"
+    remove_vm
+  fi
+}
+trap cleanup EXIT
+trap 'exit 130' INT TERM HUP
 
 run_args=()
 [[ -n ${ALUMINIUM_VM_HEADLESS:-} ]] && run_args=(--no-graphics)
@@ -46,8 +77,6 @@ run_pid=$!
 ip=$(tart ip "$vm" --wait 120)
 
 # Log in over SSH with the image's default password.
-askpass=$(mktemp)
-trap 'rm -f "$askpass"' EXIT
 printf '#!/bin/sh\necho admin\n' >"$askpass"
 chmod 700 "$askpass"
 vm_ssh() {
@@ -106,5 +135,5 @@ else
   echo "The guest agent isn't running yet; it starts when admin logs in." >&2
 fi
 
-echo "VM '$vm' is running. Closing its window (or Ctrl-C) stops it."
+echo "VM '$vm' is running. Close its window or press Ctrl-C to stop and delete it."
 wait "$run_pid"

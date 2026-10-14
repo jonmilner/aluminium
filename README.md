@@ -60,7 +60,7 @@ Run single steps by name, e.g. `./bootstrap links github`. Steps, in order: `xco
 
 ## Testing
 
-`scripts/test-vm [version]` opens a fresh macOS VM with copy and paste to and from this Mac (needs [Tart](https://tart.run); the first run downloads a ~28 GB image). Log in as `admin` / `admin`, open Terminal and run the `curl` command above. To test a branch before it merges, put the branch name in the URL in place of `main` and pipe to `ALUMINIUM_REF=<branch> bash`. Automated tests are planned in [docs/plans/automated-testing.md](docs/plans/automated-testing.md).
+`scripts/test-vm [version]` opens a fresh macOS VM with copy and paste to and from this Mac (needs [Tart](https://tart.run); the first run downloads a ~28 GB image). Paste the `curl` command above into Terminal in the VM (it's logged in as `admin`, password `admin`). Closing the VM window or pressing Ctrl-C deletes the VM; `scripts/test-vm --clean` removes one left behind. To test a branch before it merges, put the branch name in the URL in place of `main` and pipe to `ALUMINIUM_REF=<branch> bash`. Automated tests are planned in [docs/plans/automated-testing.md](docs/plans/automated-testing.md).
 
 ## Layout
 
