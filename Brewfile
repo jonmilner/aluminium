@@ -2,13 +2,19 @@
 # Machine-specific additions go in Brewfile.local (untracked).
 # VS Code extensions are left to VS Code Settings Sync.
 
-# CLI (under review)
-brew "diff-so-fancy" # used by gitconfig pager
-brew "ffmpeg"
+# CLI
 brew "gh"
-brew "git-lfs"       # gitconfig enables the lfs filter
 brew "gitleaks"
-brew "mas"
+
+# Shell
+brew "fzf"
+brew "pure"
+brew "zoxide"
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
+
+# macOS
+brew "dockutil"
 
 # Apps
 cask "1password"

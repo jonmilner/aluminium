@@ -11,19 +11,11 @@
 [alias]
   l = log --color --pretty=format:'%C(blue)%an%Creset %C(magenta)%ad%Creset %C(magenta)(%ar)%Creset %C(green)%h%Creset %C(yellow)%D%Creset \n - %s \n' --abbrev-commit --date=short
   stats = shortlog -sn
-[pager]
-  diff = diff-so-fancy | less --tabs=4 -RFX
-  show = diff-so-fancy | less --tabs=4 -RFX
 [pull]
   rebase = true
 [push]
   default = current
 [credential]
   helper = osxkeychain
-[filter "lfs"]
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-	required = true
-	clean = git-lfs clean -- %f
 [init]
 	defaultBranch = main

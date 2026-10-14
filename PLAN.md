@@ -49,7 +49,7 @@ Fresh machine entry point: a `curl | bash` one-liner that clones the repo and ru
 ### 3. Shell and dev tooling
 - Rewrite `zshrc` without oh-my-zsh. Keep `~/.zshrc` as a stub that sources the repo, so installers that append to it don't break the link.
 - Vite+ only: remove `fnm` and the `chpwd` hook. Check whether Vite+ switches Node per project from `.nvmrc`. Pick one pnpm (remove `PNPM_HOME` or Vite+'s copy).
-- Fix `gitconfig`: install the diff pager it uses (or switch to `delta`), add `git-lfs` to the Brewfile, drop the missing `~/.gitattributes`, move the global ignore to `~/.config/git/ignore`.
+- Fix `gitconfig`: drop the missing `~/.gitattributes`, move the global ignore to `~/.config/git/ignore`. (The diff-so-fancy pager and LFS filter are already gone: changes are reviewed in GitHub Desktop and no repos use LFS.)
 - Set `EDITOR="code --wait"`.
 
 ### 4. Refresh macOS defaults
