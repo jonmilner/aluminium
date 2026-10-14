@@ -92,6 +92,9 @@ Open:
 - Codex: `~/.codex` exists but `codex` isn't installed. Skip unless wanted.
 - Optional: clone your other projects into `~/git` from a list.
 
+### 8. Automated testing
+A `scripts/test` command that runs unit tests, and an end-to-end test that boots a clean macOS VM (Tart) of a chosen version, runs `bootstrap`, checks the result and deletes the VM. Full plan: [docs/plans/automated-testing.md](docs/plans/automated-testing.md).
+
 ## Known bugs in the current scripts
 Fixed by the rewrite. Listed so none come back:
 - Homebrew PATH assumes Intel (`/usr/local`).
