@@ -1,0 +1,239 @@
+#!/usr/bin/env bash
+# Set up a new Mac, or re-sync an existing one. Safe to re-run.
+#
+#   ./bootstrap               run the default steps
+#   ./bootstrap links ssh     run only the named steps
+#
+# New Mac (clones to ~/aluminium, or $ALUMINIUM_DIR):
+#   curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/main/bootstrap | bash
+#
+# Written for the stock macOS bash 3.2.
+
+set -eo pipefail
+
+REPO_URL="https://github.com/jonmilner/aluminium.git"
+ICLOUD="$HOME/Library/Mobile Documents/com~apple~CloudDocs"
+SECRETS="$ICLOUD/dotfiles/secrets.zsh"
+
+# repo path:path under $HOME
+LINKS=(
+  "home/zshrc:.zshrc"
+  "home/gitconfig:.gitconfig"
+  "home/gitignore:.gitignore"
+  "home/npmrc:.npmrc"
+  "home/ssh_config:.ssh/config"
+  "config/ghostty/config:.config/ghostty/config"
+)
+
+# `macos` runs only when named until its scripts are refreshed (PLAN.md phase 4).
+DEFAULT_STEPS=(xcode homebrew packages vite links ssh secrets checklist)
+ALL_STEPS=(xcode homebrew packages vite links ssh secrets macos checklist)
+
+WARNINGS=()
+
+say()  { printf '\n\033[1m→ %s\033[0m\n' "$*"; }
+ok()   { printf '  ✓ %s\n' "$*"; }
+warn() { printf '  \033[33m! %s\033[0m\n' "$*" >&2; WARNINGS+=("$*"); }
+
+need_sudo() {
+  [[ -n $SUDO_KEEPALIVE ]] && return
+  sudo -v
+  while true; do sudo -n true; sleep 50; kill -0 "$$" || exit; done 2>/dev/null &
+  SUDO_KEEPALIVE=$!
+  trap 'kill $SUDO_KEEPALIVE 2>/dev/null' EXIT
+}
+
+load_brew() {
+  local b
+  for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    if [[ -x $b ]]; then eval "$("$b" shellenv)"; return 0; fi
+  done
+  return 1
+}
+
+###############################################################################
+# Steps
+###############################################################################
+
+step_xcode() {
+  if xcode-select -p >/dev/null 2>&1; then
+    ok "Command Line Tools installed"
+    return
+  fi
+  xcode-select --install >/dev/null 2>&1 || true
+  echo "  Finish the Command Line Tools installer window. Waiting…"
+  until xcode-select -p >/dev/null 2>&1; do sleep 5; done
+  ok "Command Line Tools installed"
+}
+
+step_homebrew() {
+  if load_brew; then
+    ok "Homebrew installed"
+    return
+  fi
+  need_sudo
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  load_brew
+  ok "Homebrew installed"
+}
+
+step_packages() {
+  load_brew || { warn "Homebrew missing; run: ./bootstrap homebrew"; return; }
+  need_sudo
+  # Casks adopt apps that were installed by hand.
+  brew bundle --file="$REPO/Brewfile" || warn "brew bundle reported failures (see above)"
+  if [[ -f $REPO/Brewfile.local ]]; then
+    brew bundle --file="$REPO/Brewfile.local" || warn "brew bundle (Brewfile.local) reported failures"
+  fi
+}
+
+step_vite() {
+  # Runs before `links`: the installer edits ~/.zshrc, and that edit should land
+  # in the pre-link file that gets backed up, not in the repo.
+  if [[ -x $HOME/.local/share/vite-plus/bin/vp ]] || command -v vp >/dev/null 2>&1; then
+    ok "Vite+ installed"
+    return
+  fi
+  curl -fsSL https://vite.plus | VP_NODE_MANAGER=yes bash
+  ok "Vite+ installed"
+}
+
+step_links() {
+  local entry src rel dst stamp
+  stamp=$(date +%Y%m%d-%H%M%S)
+  mkdir -p -m 700 "$HOME/.ssh"
+  for entry in "${LINKS[@]}"; do
+    src="$REPO/${entry%%:*}"
+    rel="${entry#*:}"
+    dst="$HOME/$rel"
+    if [[ -L $dst && "$(readlink "$dst")" == "$src" ]]; then
+      ok "~/$rel"
+      continue
+    fi
+    mkdir -p "$(dirname "$dst")"
+    if [[ -e $dst || -L $dst ]]; then
+      mv "$dst" "$dst.backup-$stamp"
+      warn "Moved the old ~/$rel to ~/$rel.backup-$stamp"
+    fi
+    ln -s "$src" "$dst"
+    ok "~/$rel"
+  done
+}
+
+step_ssh() {
+  local key="$HOME/.ssh/id_ed25519" pub keys url
+  if [[ ! -f $key ]]; then
+    echo "  Creating an SSH key for this Mac. Pick a passphrase; Keychain will remember it."
+    ssh-keygen -q -t ed25519 -C "$(id -un)@$(scutil --get LocalHostName)" -f "$key"
+  fi
+  ssh-add --apple-use-keychain "$key" 2>/dev/null
+  ok "SSH key in Keychain"
+
+  if ! command -v gh >/dev/null 2>&1; then
+    warn "gh missing; run: ./bootstrap packages ssh"
+    return
+  fi
+  if ! gh auth status >/dev/null 2>&1; then
+    gh auth login --hostname github.com --git-protocol ssh --web --skip-ssh-key
+  fi
+
+  pub=$(cut -d' ' -f2 "$key.pub")
+  if ! keys=$(gh ssh-key list 2>/dev/null); then
+    gh auth refresh --hostname github.com --scopes admin:public_key
+    keys=$(gh ssh-key list)
+  fi
+  if grep -qF "$pub" <<<"$keys"; then
+    ok "SSH key on GitHub"
+  else
+    gh ssh-key add "$key.pub" --title "$(scutil --get ComputerName)"
+    ok "SSH key added to GitHub"
+  fi
+
+  # Trust GitHub's host keys from its API (over HTTPS) instead of on first use.
+  if ! ssh-keygen -F github.com >/dev/null 2>&1; then
+    gh api meta --jq '.ssh_keys[]' | sed 's/^/github.com /' >>"$HOME/.ssh/known_hosts"
+    ok "GitHub host keys added to known_hosts"
+  fi
+
+  url=$(git -C "$REPO" remote get-url origin)
+  if [[ $url == https://github.com/* ]]; then
+    git -C "$REPO" remote set-url origin "git@github.com:${url#https://github.com/}"
+    ok "Repo remote switched to SSH"
+  fi
+}
+
+step_secrets() {
+  if [[ ! -d $ICLOUD ]]; then
+    warn "iCloud Drive isn't on. Sign in to iCloud, turn on iCloud Drive, then run: ./bootstrap secrets"
+    return
+  fi
+  mkdir -p "$(dirname "$SECRETS")"
+  # Ask iCloud to download the file if it's only a placeholder on this Mac.
+  brctl download "$SECRETS" >/dev/null 2>&1 || true
+  if [[ -e $SECRETS ]]; then
+    ok "secrets.zsh found in iCloud Drive"
+  else
+    warn "No secrets file yet. Create iCloud Drive/dotfiles/secrets.zsh with export lines (e.g. NPM_TOKEN_JONMILNER)"
+  fi
+}
+
+step_macos() {
+  need_sudo
+  bash "$REPO/macos/set-defaults.sh"
+  killall Dock Finder SystemUIServer 2>/dev/null || true
+  ok "macOS defaults applied"
+}
+
+step_checklist() {
+  cat <<'EOF'
+  Manual steps (once per Mac):
+  [ ] Sign in to 1Password and Passwords
+  [ ] Raycast: import settings (Settings → Advanced → Import)
+  [ ] Grant permissions when apps ask: Raycast and Bartender (Accessibility,
+      Screen Recording)
+  [ ] Bartender: enter license
+  [ ] Open a new terminal window to load the shell config
+EOF
+}
+
+###############################################################################
+# Main
+###############################################################################
+
+# Piped from curl: fetch the repo, then run its copy of this script.
+if [[ ! -f ${BASH_SOURCE[0]} ]]; then
+  dir="${ALUMINIUM_DIR:-$HOME/aluminium}"
+  say "xcode"
+  step_xcode
+  if [[ ! -e $dir/.git ]]; then
+    git clone "$REPO_URL" "$dir"
+  fi
+  # stdin is the curl pipe; prompts need the terminal.
+  if (exec </dev/tty) 2>/dev/null; then
+    exec "$dir/bootstrap" "$@" </dev/tty
+  fi
+  exec "$dir/bootstrap" "$@"
+fi
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+load_brew || true
+
+if [[ $# -eq 0 ]]; then
+  set -- "${DEFAULT_STEPS[@]}"
+fi
+for s in "$@"; do
+  if ! declare -F "step_$s" >/dev/null; then
+    echo "Unknown step: $s. Steps: ${ALL_STEPS[*]}" >&2
+    exit 1
+  fi
+done
+
+for s in "$@"; do
+  say "$s"
+  "step_$s"
+done
+
+if [[ ${#WARNINGS[@]} -gt 0 ]]; then
+  say "Needs attention"
+  for w in "${WARNINGS[@]}"; do printf '  ! %s\n' "$w"; done
+fi

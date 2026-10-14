@@ -74,7 +74,7 @@ esac
 # pnpm end
 
 # Vite+ bin (https://viteplus.dev)
-. "/Users/jonmilner/.config/vite-plus/env"
+[[ -r $HOME/.config/vite-plus/env ]] && . "$HOME/.config/vite-plus/env"
 
 # flatten-movies [-n] <dir>
 # For each "Title (YYYY) [..]..." folder in <dir>, move its main video file to

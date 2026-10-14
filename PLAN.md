@@ -34,20 +34,17 @@ Findings:
 - [x] No hardcoded `~/aluminium`: `zshrc` finds the repo from its own symlink, and `set-defaults.sh` from its own location.
 - [x] Prune the Brewfile to what belongs on every machine. Machine-specific apps go in `Brewfile.local` (untracked).
 
-**Don't merge this branch until `bootstrap` exists.** The live `~/.gitconfig` and Ghostty symlinks, and the live `~/.zshrc`, still point at the old paths. After merging, run `bootstrap` once to re-link everything.
+The live `~/.gitconfig` and Ghostty symlinks, and the live `~/.zshrc`, still point at the old paths. After merging, run `./bootstrap` once to re-link everything.
 
 ### 2. Bootstrap script
-In order, each step skipped if already done:
-1. Xcode Command Line Tools: install, then wait until finished.
-2. Homebrew, then `eval "$(/opt/homebrew/bin/brew shellenv)"`.
-3. `brew bundle` (plus `Brewfile.local` if present).
-4. Symlinks from the manifest, with timestamped backups.
-5. SSH key and `gh auth login`.
-6. Secrets: if `secrets.zsh` is in iCloud Drive but not downloaded yet, fetch it with `brctl download`. If it's missing, warn and carry on.
-7. macOS defaults, then restart Dock, Finder and SystemUIServer.
-8. Print the remaining manual checklist.
+- [x] `bootstrap`: named steps, each skipped if already done. Runs on stock bash 3.2. Default order: `xcode`, `homebrew`, `packages`, `vite` (before `links`, so its `~/.zshrc` edit lands in the backed-up file), `links`, `ssh`, `secrets`, `checklist`.
+- [x] `ssh`: per-machine ed25519 key in Keychain, `gh auth login`, key uploaded to GitHub, GitHub host keys from its API, repo remote switched to SSH.
+- [x] `macos` exists but only runs when named, until phase 4.
+- [x] `curl | bash` entry point: installs Command Line Tools, clones, re-runs from the clone.
+- [x] README rewritten around `bootstrap`.
+- Tested in a throwaway `$HOME`: `links` (backups, re-run), `secrets`, unknown steps, `curl` mode. Not yet run for real: `homebrew`, `packages`, `vite`, `ssh`, `macos`.
 
-Fresh machine entry point: a `curl | bash` one-liner that clones the repo and runs `bootstrap`.
+**Merge after phase 3.** `bootstrap` doesn't install oh-my-zsh, so the current `zshrc` would fail on a new Mac. Merging also breaks syntax highlighting here, because that plugin lives in the old `dotfiles/zsh/plugins` folder.
 
 ### 3. Shell and dev tooling
 - Rewrite `zshrc` without oh-my-zsh. Keep `~/.zshrc` as a stub that sources the repo, so installers that append to it don't break the link.

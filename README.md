@@ -1,54 +1,38 @@
 # 💻 Aluminium
 
-> Being rewritten. See [PLAN.md](PLAN.md); the steps below are out of date.
+Sets up a Mac, or re-syncs one, with a single script.
 
-Aluminium is a shell script to set up a new macOS environment.
+## New Mac
 
-## Reinstall macOS (Optional)
+1. Sign in to iCloud (with iCloud Drive on).
+2. Open Terminal and run:
 
-Reboot into **Recovery Mode** by holding the Command (⌘) and R keys until the Apple logo appears on the screen.
+   ```sh
+   curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/main/bootstrap | bash
+   ```
 
-## Run Aluminium
+   This installs the Command Line Tools, clones the repo to `~/aluminium` (or `$ALUMINIUM_DIR`), and runs `bootstrap`.
+3. Work through the checklist it prints at the end.
 
-The following steps should be run in order.
-
-### 1. 🗜 Install Xcode
-
-- Open Terminal
-- Run `git`
-- Click **Get Xcode**
-
-### 2. 🧟‍ Install zsh
+## Existing Mac
 
 ```sh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+cd ~/aluminium && git pull && ./bootstrap
 ```
 
-### 3. 👨‍💻 Sign into App Store
+Run single steps by name, e.g. `./bootstrap links ssh`. Steps: `xcode`, `homebrew`, `packages`, `vite`, `links`, `ssh`, `secrets`, `macos`, `checklist`. `macos` only runs when named, until its scripts are refreshed.
 
-This needs to be done manually prior to running the script.
+## Layout
 
-### 4. ⬇️ Download Aluminium
+| Path | What |
+|---|---|
+| `Brewfile` | CLI tools and apps for every Mac. Add machine-specific ones to `Brewfile.local` (untracked). |
+| `home/` | Linked into `~` (see `LINKS` in `bootstrap`). |
+| `config/` | Linked into `~/.config`. |
+| `zsh/` | Loaded by `zshrc`. |
+| `macos/` | `defaults` scripts. |
 
-```sh
-git clone https://github.com/jonmilner/aluminium.git ~/aluminium && cd aluminium
-```
-
-### 5. 💾 Run the Script
-
-```sh
-sh aluminium
-```
-
-### 6. 🎨 Install zsh-syntax-highlighting
-
-```sh
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-```
-
-### 7. ⌨️ Open VSCode from Command Line with `code .`
-
-Open the Command Palette (⇧⌘P) and type `shell command` to find the **Shell Command: Install 'code' command in PATH** command.
+Secrets live in `iCloud Drive/dotfiles/secrets.zsh`, never in this repo. `zshrc` loads it if present.
 
 ---
 
