@@ -23,7 +23,7 @@ You'll be asked for three things, all in the first minute:
 2. **A name for this Mac.** Press Enter to keep the current one. Asked once per Mac.
 3. **GitHub sign-in.** Press Enter, then approve the one-time code in your browser. This uploads the new Mac's SSH key and lets the script clone private repos.
 
-After that it runs unattended: apps and tools, Vite+, dotfile links, secrets and macOS settings. It clones this repo to `~/aluminium` (set `$ALUMINIUM_DIR` to change that). If macOS asks whether Terminal may access iCloud Drive, allow it.
+After that it runs unattended: apps and tools, Vite+, dotfile links, secrets and macOS settings. It clones this repo to `~/aluminium` (set `$ALUMINIUM_DIR` to change that). If macOS asks whether Terminal may access iCloud Drive or control Finder, allow it.
 
 ### After it finishes
 

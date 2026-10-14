@@ -63,9 +63,9 @@ Ready to merge after phase 3. See "First run on an existing Mac" in the README.
 - [x] `macos` runs by default. Where the scripts and this Mac differed (Dock size, spring-loading delay, Finder grouping and new-window target, App Store auto-update, currency), the scripts win.
 - [x] Finder: column view grouped by Kind, sorted by Name. Nested settings (Desktop, icon view, toolbar) now go through `defaults export`/`import` with an add-or-set helper, instead of PlistBuddy on the live plist (cfprefsd could overwrite it; `Set` failed on a new Mac).
 - [x] Sidebar favorites and Locations: `macos/lib/finder-sidebar.py` (LSSharedFileList via ctypes; `--dry-run` compares only). Read path verified on 26.6; write path untested.
-- [ ] Per-folder views (Screenshots: list by Date Modified; Applications: list by Name) via Finder AppleScript. Blocked on the Automation permission; also unverified whether it sets "Always open in".
+- [x] Per-folder views (Screenshots: list, newest first; Applications: list by Name) via Finder AppleScript. Verified on this Mac, including after a Finder restart. iCloud folders keep view settings outside `.DS_Store`.
 - [x] Clock, trackpad secondary click, keyboard navigation, dark mode, typing aids off, Dock minimize, WindowManager, Touch ID sudo, firewall, default apps (`duti`), computer name (`name` step).
-- [ ] Desktop widgets: confirm whether shown or hidden (`StandardHideWidgets`).
+- [x] Desktop widgets stay shown (`StandardHideWidgets` false).
 - [ ] Mouse buttons 4 and 5 → Show Desktop and Mission Control (`assets/mission-control-mouse-setup.png`): stored as `type = button` entries in `com.apple.symbolichotkeys`, but the button numbering is unverified. Set it once in System Settings with a multi-button mouse, read back keys 32 and 36, then script it.
 - Unverified keys kept (harmless if ignored): clock `DateFormat`, `mru-spaces`, `NSNavPanelExpandedStateForSaveMode2`, CrashReporter `DialogType`, `askForPassword`, printing keys, `include-date`, `DoNotOfferNewDisksForBackup`, `DSDontWriteUSBStores`, `OpenWindowForNewRemovableDisk`, `disableHotPlug`, iWork and Chrome keys.
 

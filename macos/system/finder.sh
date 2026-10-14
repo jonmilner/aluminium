@@ -145,3 +145,43 @@ rm -f "$finder_plist"
 
 echo "∙ Sidebar favorites and locations"
 /usr/bin/python3 -I "$dir/lib/finder-sidebar.py"
+
+# Per-folder views. Finder keeps these itself (in .DS_Store, or elsewhere for
+# iCloud folders), so they're set through Finder. The first run asks to let
+# the terminal control Finder.
+# finder_list_view <folder> <name|modified> <normal|reversed>
+finder_list_view() {
+  [[ -d $1 ]] || return 0
+  osascript - "$@" >/dev/null 2>&1 <<'APPLESCRIPT' || echo "  ! Couldn't set the view for $1. Allow this terminal to control Finder (System Settings → Privacy & Security → Automation), then run: ./bootstrap macos"
+on run {folderPath, sortBy, direction}
+  with timeout of 60 seconds
+    tell application "Finder"
+      open ((POSIX file folderPath) as alias)
+      delay 1
+      set w to Finder window 1
+      set current view of w to list view
+      set opts to list view options of w
+      if sortBy is "modified" then
+        set sort column of opts to modification date column
+        set c to column id modification date column of opts
+      else
+        set sort column of opts to name column
+        set c to column id name column of opts
+      end if
+      if direction is "reversed" then
+        set sort direction of c to reversed
+      else
+        set sort direction of c to normal
+      end if
+      close w
+    end tell
+  end timeout
+end run
+APPLESCRIPT
+}
+
+echo "∙ Screenshots: list view, newest first"
+finder_list_view "$HOME/Library/Mobile Documents/com~apple~CloudDocs/Screenshots" modified reversed
+
+echo "∙ Applications: list view, by name"
+finder_list_view /Applications name normal

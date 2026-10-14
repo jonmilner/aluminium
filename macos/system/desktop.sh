@@ -9,3 +9,6 @@ defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool fa
 
 echo "∙ No margins between tiled windows"
 defaults write com.apple.WindowManager EnableTiledWindowMargins -bool false
+
+echo "∙ Show widgets on the desktop"
+defaults write com.apple.WindowManager StandardHideWidgets -bool false
