@@ -64,7 +64,9 @@ Ready to merge after phase 3. See "First run on an existing Mac" in the README.
 - [x] Finder: column view grouped by Kind, sorted by Name. Nested settings (Desktop, icon view, toolbar) now go through `defaults export`/`import` with an add-or-set helper, instead of PlistBuddy on the live plist (cfprefsd could overwrite it; `Set` failed on a new Mac).
 - [x] Sidebar favorites and Locations: `macos/lib/finder-sidebar.py` (LSSharedFileList via ctypes; `--dry-run` compares only). Tested on 26.6: removes extras, then moves/adds each target item in place (inserting an existing item moves it). Never removes a target item, because some can't be re-added: `/` must be added via its `/Volumes` link, and cloud-provider folders (SynologyDrive) can't be added by this API at all, only by dragging in Finder.
 - [x] Menu bar: Control Center and Battery (with percentage) shown; Wi-Fi, Sound, Bluetooth, Focus, Now Playing hidden. Fast User Switching left at the default.
-- [x] Energy (laptops): on power, never sleep while open (`pmset -c sleep 0`); battery and lid-closed behaviour unchanged.
+- [x] Energy: on power, never sleep by itself (`pmset -c sleep 0`), laptops and desktops; display sleep, battery and lid-closed behaviour unchanged.
+- [x] Dock fade for hidden apps (`showhidden`) confirmed working on 26.6 by eye.
+- [x] Menu bar never auto-hides.
 - [x] Per-folder views (Screenshots: list, newest first; Applications: list by Name) via Finder AppleScript. Verified on this Mac, including after a Finder restart. iCloud folders keep view settings outside `.DS_Store`.
 - [x] Clock, trackpad secondary click, keyboard navigation, dark mode, typing aids off, Dock minimize, WindowManager, Touch ID sudo, firewall, default apps (`duti`), computer name (`name` step).
 - [x] Desktop widgets stay shown (`StandardHideWidgets` false).
