@@ -82,8 +82,8 @@ Target: finish Setup Assistant, open Terminal, paste one command, answer two pro
 - [x] `packages` checks App Management permission before adopting hand-installed apps (existing Macs only).
 - [x] Every manual step is in the README (before, during, after, existing-Mac only). `bootstrap` prints the "after" checklist from the README, so there's one copy.
 - [ ] Verify on a fresh Mac or a new macOS user account: the `softwareupdate` label parsing, whether the Vite+ installer still prompts with `VP_NODE_MANAGER=yes`, and whether macOS asks before Terminal touches iCloud Drive.
-- [x] Phase 4 adds any permissions the defaults scripts need to the README. Full Disk Access for Safari (README and checklist); the rest uses sudo, which `bootstrap` already asks for.
-- [ ] Optional: Touch ID for `sudo` (`/etc/pam.d/sudo_local`), so the password prompt becomes a fingerprint on later runs.
+- [x] Phase 4 adds any permissions the defaults scripts need to the README. Full Disk Access for Safari and the Finder view reset (README and checklist); the rest uses sudo, which `bootstrap` already asks for.
+- [x] Touch ID for `sudo` (`/etc/pam.d/sudo_local`), so the password prompt becomes a fingerprint on later runs (phase 4, `security-privacy.sh`).
 
 ### 6. Prevent drift
 - `bootstrap --check`: report unlinked or modified files and Brewfile differences without changing anything.
