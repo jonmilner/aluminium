@@ -39,6 +39,24 @@ say()  { printf '\n\033[1m→ %s\033[0m\n' "$*"; }
 ok()   { printf '  ✓ %s\n' "$*"; }
 warn() { printf '  \033[33m! %s\033[0m\n' "$*" >&2; WARNINGS+=("$*"); }
 
+# Steps that use sudo, so they need an administrator account.
+SUDO_STEPS=" xcode homebrew packages macos "
+
+require_admin() {
+  id -Gn | tr ' ' '\n' | grep -qx admin && return
+  echo "This account ($(id -un)) isn't an administrator, so it can't install software." >&2
+  echo "Use an admin account, or turn on \"Allow this user to administer this computer\"" >&2
+  echo "for it in System Settings → Users & Groups." >&2
+  exit 1
+}
+
+# Homebrew belongs to the account that installed it; other accounts can't use it.
+brew_writable() {
+  [[ -w $HOMEBREW_CELLAR ]] && return
+  warn "Homebrew in $HOMEBREW_PREFIX belongs to $(stat -f %Su "$HOMEBREW_PREFIX"), so this account can't install packages. Run this step as that user."
+  return 1
+}
+
 need_sudo() {
   [[ -n $SUDO_KEEPALIVE ]] && return
   sudo -v
@@ -109,6 +127,7 @@ can_modify_apps() {
 
 step_packages() {
   load_brew || { warn "Homebrew missing; run: ./bootstrap homebrew"; return; }
+  brew_writable || return 0
   if ! can_modify_apps; then
     warn "This terminal can't take over apps installed by hand. Turn it on in System Settings → Privacy & Security → App Management, quit and reopen the terminal, then run: ./bootstrap packages"
     open "x-apple.systempreferences:com.apple.preference.security?Privacy_AppBundles" 2>/dev/null || true
@@ -188,6 +207,7 @@ step_github() {
 
   if ! command -v gh >/dev/null 2>&1; then
     load_brew || { warn "Homebrew missing; run: ./bootstrap homebrew github"; return; }
+    brew_writable || return 0
     brew install --quiet gh
   fi
   if ! gh auth status >/dev/null 2>&1; then
@@ -254,6 +274,7 @@ step_checklist() {
 
 # Piped from curl: fetch the repo, then run its copy of this script.
 if [[ ! -f ${BASH_SOURCE[0]} ]]; then
+  require_admin
   dir="${ALUMINIUM_DIR:-$HOME/aluminium}"
   say "xcode"
   step_xcode
@@ -278,6 +299,10 @@ for s in "$@"; do
     echo "Unknown step: $s. Steps: ${ALL_STEPS[*]}" >&2
     exit 1
   fi
+done
+# Fail before any prompts rather than halfway through.
+for s in "$@"; do
+  case $SUDO_STEPS in *" $s "*) require_admin; break ;; esac
 done
 
 for s in "$@"; do

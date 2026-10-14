@@ -7,6 +7,7 @@ Sets up a Mac, or re-syncs one, with a single script.
 ### Before you start
 
 - Finish macOS Setup Assistant and sign in with your Apple Account. This turns on iCloud Drive, which holds your secrets file.
+- Use an administrator account. The account Setup Assistant creates is one; `bootstrap` stops early if yours isn't.
 
 ### Run it
 
