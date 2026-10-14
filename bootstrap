@@ -80,8 +80,27 @@ step_homebrew() {
   ok "Homebrew installed"
 }
 
+# Adopting a hand-installed app means changing its bundle, which macOS blocks
+# unless the terminal has App Management permission. Probe one app we own
+# (not the terminal itself, which may always modify its own bundle).
+can_modify_apps() {
+  local app
+  for app in /Applications/*.app; do
+    [[ -O $app ]] || continue
+    [[ $(defaults read "$app/Contents/Info" CFBundleIdentifier 2>/dev/null) == "$__CFBundleIdentifier" ]] && continue
+    chgrp "$(stat -f %g "$app")" "$app" 2>/dev/null
+    return
+  done
+  return 0
+}
+
 step_packages() {
   load_brew || { warn "Homebrew missing; run: ./bootstrap homebrew"; return; }
+  if ! can_modify_apps; then
+    warn "This terminal can't take over apps installed by hand. Turn it on in System Settings → Privacy & Security → App Management, quit and reopen the terminal, then run: ./bootstrap packages"
+    open "x-apple.systempreferences:com.apple.preference.security?Privacy_AppBundles" 2>/dev/null || true
+    return
+  fi
   need_sudo
   # Casks adopt apps that were installed by hand.
   brew bundle --file="$REPO/Brewfile" || warn "brew bundle reported failures (see above)"
