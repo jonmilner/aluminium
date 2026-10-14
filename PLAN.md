@@ -28,10 +28,13 @@ Findings:
 - VS Code Settings Sync already covers its settings and extensions, so they stay out of the Brewfile.
 
 ### 1. Restructure
-- New layout: `Brewfile`, `home/` (files linked into `~`), `config/` (files linked into `~/.config`), `macos/`, `bootstrap`.
-- Delete `install/*`, `functions`, `hyper.js` and `z.sh`. Keep `npmrc`: it reads `NPM_TOKEN_JONMILNER` from the environment, which `secrets.zsh` sets.
-- Remove all Dropbox references (app list, Dock, `private.zsh` line). Screenshots now go to `iCloud Drive/Screenshots`.
-- Prune the Brewfile to what belongs on every machine. Machine-specific apps go in `Brewfile.local` (untracked).
+- [x] New layout: `Brewfile`, `home/` (files linked into `~`), `config/` (files linked into `~/.config`), `zsh/` (files `zshrc` sources), `macos/`.
+- [x] Delete `install/*`, `functions`, `aluminium`, `hyper.js` and `z.sh`. Keep `npmrc`: it reads `NPM_TOKEN_JONMILNER` from the environment, which `secrets.zsh` sets.
+- [x] Remove all Dropbox references. Screenshots go to `iCloud Drive/Screenshots`; `zshrc` loads secrets from iCloud Drive.
+- [x] No hardcoded `~/aluminium`: `zshrc` finds the repo from its own symlink, and `set-defaults.sh` from its own location.
+- [x] Prune the Brewfile to what belongs on every machine. Machine-specific apps go in `Brewfile.local` (untracked).
+
+**Don't merge this branch until `bootstrap` exists.** The live `~/.gitconfig` and Ghostty symlinks, and the live `~/.zshrc`, still point at the old paths. After merging, run `bootstrap` once to re-link everything.
 
 ### 2. Bootstrap script
 In order, each step skipped if already done:

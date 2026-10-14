@@ -1,5 +1,7 @@
 # 💻 Aluminium
 
+> Being rewritten. See [PLAN.md](PLAN.md); the steps below are out of date.
+
 Aluminium is a shell script to set up a new macOS environment.
 
 ## Reinstall macOS (Optional)
@@ -53,7 +55,3 @@ Open the Command Palette (⇧⌘P) and type `shell command` to find the **Shell 
 ## Acknowledgements
 
 - [Formation](https://github.com/minamarkham/formation) by Mina Markham.
-
-////////
-
-ln -sfn ~/aluminium/dotfiles/ghostty.conf ~/.config/ghostty/config

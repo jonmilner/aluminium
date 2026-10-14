@@ -1,0 +1,6 @@
+# Ghostty config. Docs: https://ghostty.org/docs/config
+
+font-family = Operator Mono
+theme = GitHub Dark
+window-padding-x = 12
+window-padding-y = 8
