@@ -7,6 +7,7 @@ Sets up a Mac, or re-syncs one, with a single script.
 ### Before you start
 
 - Finish macOS Setup Assistant and sign in with your Apple Account. This turns on iCloud Drive, which holds your secrets file.
+- Use an administrator account. The account Setup Assistant creates is one; `bootstrap` stops early if yours isn't.
 
 ### Run it
 
@@ -56,6 +57,10 @@ cd ~/aluminium && git pull && ./bootstrap
 ### Steps
 
 Run single steps by name, e.g. `./bootstrap links github`. Steps, in order: `xcode`, `homebrew`, `github`, `packages`, `vite`, `links`, `secrets`, `macos`, `checklist`. `macos` only runs when named, until its scripts are refreshed.
+
+## Testing
+
+`scripts/test-vm [version]` opens a fresh macOS VM with copy and paste to and from this Mac (needs [Tart](https://tart.run); the first run downloads a ~28 GB image). Paste the `curl` command above into Terminal in the VM (it's logged in as `admin`, password `admin`). Closing the VM window or pressing Ctrl-C deletes the VM; `scripts/test-vm --clean` removes one left behind. To test a branch before it merges, put the branch name in the URL in place of `main` and pipe to `ALUMINIUM_REF=<branch> bash`. Automated tests are planned in [docs/plans/automated-testing.md](docs/plans/automated-testing.md).
 
 ## Layout
 
