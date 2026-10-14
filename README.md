@@ -22,7 +22,7 @@ You'll be asked for two things, both in the first minute:
 1. **Your Mac password**, once. It installs the Command Line Tools and Homebrew.
 2. **GitHub sign-in.** Press Enter, then approve the one-time code in your browser. This uploads the new Mac's SSH key and lets the script clone private repos.
 
-After that it runs unattended: apps and tools, Vite+, dotfile links and secrets. It clones this repo to `~/aluminium` (set `$ALUMINIUM_DIR` to change that). If macOS asks whether Terminal may access iCloud Drive, allow it.
+After that it runs unattended: apps and tools, Vite+, dotfile links, secrets and macOS settings. It clones this repo to `~/aluminium` (set `$ALUMINIUM_DIR` to change that). If macOS asks whether Terminal may access iCloud Drive, allow it.
 
 ### After it finishes
 
@@ -50,13 +50,13 @@ cd ~/aluminium && git pull && ./bootstrap
 - **Old files.** The first run moves your current `~/.zshrc` and other dotfiles to `*.backup-<date>` files. Once the new shell works, these are safe to remove, along with tools Aluminium no longer uses:
 
   ```sh
-  rm -rf ~/.oh-my-zsh ~/.zsh/pure ~/Library/pnpm ~/aluminium/dotfiles
+  rm -rf ~/.oh-my-zsh ~/.zsh/pure ~/Library/pnpm/bin ~/Library/pnpm/global ~/.local/share/fnm ~/aluminium/dotfiles
   brew uninstall fnm
   ```
 
 ### Steps
 
-Run single steps by name, e.g. `./bootstrap links github`. Steps, in order: `xcode`, `homebrew`, `github`, `packages`, `vite`, `links`, `secrets`, `macos`, `checklist`. `macos` only runs when named, until its scripts are refreshed.
+Run single steps by name, e.g. `./bootstrap links github`. Steps, in order: `xcode`, `homebrew`, `github`, `packages`, `vite`, `links`, `secrets`, `macos`, `checklist`.
 
 ## Testing
 

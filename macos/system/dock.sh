@@ -13,49 +13,25 @@ defaults write com.apple.dock size-immutable -bool true
 echo "∙ Auto-hide the Dock"
 defaults write com.apple.dock autohide -bool true
 
-echo "∙ Fade hidden applications"
-defaults write com.apple.dock showhidden -bool true
-
-echo "∙ Add iOS Simulator to Launchpad"
-sudo ln -sf "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app" "/Applications/Simulator.app"
-
-echo "∙ Remove default apps from the Dock"
-defaults write com.apple.dock persistent-apps -array
-
 echo "∙ Don't show recent applications in Dock"
 defaults write com.apple.dock show-recents -bool FALSE
 
-echo "∙ Add Applications to Dock"
-
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/Messages.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Slack.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-
-defaults write com.apple.dock persistent-apps -array-add '{"tile-type"="spacer-tile";}'
-
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Google Chrome.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Google Chrome Canary.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Firefox.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Safari.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Safari Technology Preview.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-
-defaults write com.apple.dock persistent-apps -array-add '{"tile-type"="spacer-tile";}'
-
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Hyper.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Visual Studio Code.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/GitHub Desktop.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-
-defaults write com.apple.dock persistent-apps -array-add '{"tile-type"="spacer-tile";}'
-
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/Photos.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-
-defaults write com.apple.dock persistent-apps -array-add '{"tile-type"="spacer-tile";}'
-
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/Music.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Spotify.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/Podcasts.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-
-defaults write com.apple.dock persistent-apps -array-add '{"tile-type"="spacer-tile";}'
-
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/1Password 7.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
-defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/System Preferences.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
+# Add the apps that Brewfile (and Brewfile.local) installed, if the Dock doesn't
+# already have them. Never removes or reorders anything. Menu bar utilities and
+# apps that are only opened from files stay out.
+dock_skip=" bartender raycast vlc "
+echo "∙ Add Brewfile apps missing from the Dock"
+docked=$(dockutil --list --no-restart 2>/dev/null | cut -f5)
+for brewfile in "$dir/../Brewfile" "$dir/../Brewfile.local"; do
+  [[ -f $brewfile ]] || continue
+  for cask in $(brew bundle list --cask --file="$brewfile"); do
+    [[ $dock_skip == *" $cask "* ]] && continue
+    app=$(brew info --cask --json=v2 "$cask" |
+      jq -r '.casks[0].artifacts[] | .app? // empty | if (.[1] | type) == "object" then .[1].target else .[0] end' | head -1)
+    path="/Applications/$app"
+    [[ -n $app && -d $path ]] || continue
+    id=$(defaults read "$path/Contents/Info" CFBundleIdentifier 2>/dev/null)
+    grep -qxF "$id" <<<"$docked" && continue
+    dockutil --add "$path" --no-restart >/dev/null && echo "  added $app"
+  done
+done

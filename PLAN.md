@@ -55,9 +55,12 @@ Ready to merge after phase 3. See "First run on an existing Mac" in the README.
 - Tested in a throwaway `$HOME`: the shell loads with no errors other than Pure, which isn't installed via Homebrew yet. Pure loads once it's on `fpath`.
 
 ### 4. Refresh macOS defaults
-- Check every key against macOS 26 and remove dead ones (Dashboard hot corner, `AppleFontSmoothing`, `QLEnableTextSelection`, `EmptyTrashSecurely`, Safari keys that are now sandboxed, "System Preferences" references).
-- Rebuild the Dock with `dockutil` from a list of apps that are actually installed.
-- Drop the Simulator symlink unless full Xcode is in the Brewfile.
+- [x] Checked every key against macOS 26.6 (`strings` on Dock, Finder and the dyld shared cache). Removed: `AppleFontSmoothing`, `QLEnableTextSelection`, `EmptyTrashSecurely`, Dock `showhidden`, `expose-animation-duration`, the boot-chime `nvram` (no effect on Apple silicon), `spctl --master-disable` (needs manual approval since Sequoia, and lowers security), all of `safari.sh` (sandboxed; would need Full Disk Access), the Simulator symlink. "System Preferences" is now "System Settings".
+- [x] Dock: no longer cleared and rebuilt. Adds each Brewfile/Brewfile.local app that's missing (by bundle ID, via `dockutil`), skipping menu bar utilities and VLC. Never removes or reorders.
+- [x] Spotlight's ⌘Space shortcut is turned off for Raycast.
+- [x] `macos` runs by default. Where the scripts and this Mac differed (Dock size, spring-loading delay, Finder grouping and new-window target, App Store auto-update, currency), the scripts win.
+- [ ] Mouse buttons 4 and 5 → Show Desktop and Mission Control (`assets/mission-control-mouse-setup.png`): stored as `type = button` entries in `com.apple.symbolichotkeys`, but the button numbering is unverified. Set it once in System Settings with a multi-button mouse, read back keys 32 and 36, then script it.
+- Unverified keys kept (harmless if ignored): clock `DateFormat`, `mru-spaces`, `NSNavPanelExpandedStateForSaveMode2`, CrashReporter `DialogType`, `askForPassword`, printing keys, `include-date`, `DoNotOfferNewDisksForBackup`, `DSDontWriteUSBStores`, `OpenWindowForNewRemovableDisk`, `disableHotPlug`, iWork and Chrome keys.
 
 ### 5. New-Mac experience and manual steps
 Target: finish Setup Assistant, open Terminal, paste one command, answer two prompts in the first minute, walk away.
@@ -67,7 +70,7 @@ Target: finish Setup Assistant, open Terminal, paste one command, answer two pro
 - [x] `packages` checks App Management permission before adopting hand-installed apps (existing Macs only).
 - [x] Every manual step is in the README (before, during, after, existing-Mac only). `bootstrap` prints the "after" checklist from the README, so there's one copy.
 - [ ] Verify on a fresh Mac or a new macOS user account: the `softwareupdate` label parsing, whether the Vite+ installer still prompts with `VP_NODE_MANAGER=yes`, and whether macOS asks before Terminal touches iCloud Drive.
-- [ ] Phase 4 adds any permissions the defaults scripts need (e.g. Full Disk Access for Terminal) to the README.
+- [x] Phase 4 adds any permissions the defaults scripts need to the README. None: dropping `safari.sh` removed the only Full Disk Access need; the rest uses sudo, which `bootstrap` already asks for.
 - [ ] Optional: Touch ID for `sudo` (`/etc/pam.d/sudo_local`), so the password prompt becomes a fingerprint on later runs.
 
 ### 6. Prevent drift

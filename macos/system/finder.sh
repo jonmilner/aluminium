@@ -28,9 +28,6 @@ defaults write com.apple.finder ShowStatusBar -bool true
 echo "∙ Show path bar"
 defaults write com.apple.finder ShowPathbar -bool true
 
-echo "∙ Allow text selection in Quick Look"
-defaults write com.apple.finder QLEnableTextSelection -bool true
-
 echo "∙ Show full POSIX path as window title"
 defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
@@ -121,9 +118,6 @@ defaults write com.apple.finder NewWindowTarget -string 'PfHm'
 
 echo "∙ Warning before emptying Trash"
 defaults write com.apple.finder WarnOnEmptyTrash -bool false
-
-echo "∙ Empty Trash securely"
-defaults write com.apple.finder EmptyTrashSecurely -bool false
 
 echo "∙ Set the finder window toolbar to only have back/forward buttons"
 /usr/libexec/PlistBuddy -c "Delete :NSToolbar\ Configuration\ Browser:TB\ Item\ Identifiers" ~/Library/Preferences/com.apple.finder.plist
