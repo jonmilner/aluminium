@@ -31,7 +31,7 @@ scripts/test e2e --keep --gui     # keep the VM and show its screen, for debuggi
 
 ## Facts that shape the design
 
-- **No `tart exec` on vanilla images.** It needs the Tart Guest Agent, which only the non-vanilla images include, and those come with Homebrew and other tools preinstalled, so they aren't "fresh". The harness has to use **SSH**. Vanilla images log in as `admin` / `admin` with SSH on *(unverified: SSH on by default)*.
+- **No `tart exec` on vanilla images.** It needs the Tart Guest Agent, which only the non-vanilla images include, and those come with Homebrew and other tools preinstalled, so they aren't "fresh". The harness has to use **SSH**. Vanilla images log in as `admin` / `admin`, with SSH on and password login allowed (checked 2026-10-14 on 26.6.2: boots without a window in about 7 s, port 22 open about 5 s later).
 - **Password for SSH:** use `SSH_ASKPASS` with `SSH_ASKPASS_REQUIRE=force` to install a key once, then use key auth. `bootstrap`'s `new_ssh_key` already uses this trick. `expect` ships with macOS as a fallback.
 - **Sharing the working tree:** `tart run --dir name:path[:ro]` exposes a host folder to the guest, so `--local` can test uncommitted changes. The guest path is likely `/Volumes/My Shared Files/<name>` *(unverified)*.
 - **No screen:** `tart run --no-graphics`, then `tart ip <vm> --wait 120`.
