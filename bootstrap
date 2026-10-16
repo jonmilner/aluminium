@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2088 # "~/..." in messages is display text, not a path
 # Set up a new Mac, or re-sync an existing one. Safe to re-run.
 #
 #   ./bootstrap               run the default steps
 #   ./bootstrap links github  run only the named steps
+#   ./bootstrap --check       report drift (links, uncommitted changes, packages)
+#                             without changing anything; exits 1 if there is any
 #
 # New Mac (clones to ~/aluminium, or $ALUMINIUM_DIR):
 #   curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/main/bootstrap | bash
@@ -138,6 +141,7 @@ can_modify_apps() {
   local app
   for app in /Applications/*.app; do
     [[ -O $app ]] || continue
+    # shellcheck disable=SC2154 # set by macOS for apps it launches, such as the terminal
     [[ $(defaults read "$app/Contents/Info" CFBundleIdentifier 2>/dev/null) == "$__CFBundleIdentifier" ]] && continue
     chgrp "$(stat -f %g "$app")" "$app" 2>/dev/null
     return
@@ -175,6 +179,7 @@ step_vite() {
 step_links() {
   local entry src rel dst stamp
   stamp=$(date +%Y%m%d-%H%M%S)
+  # shellcheck disable=SC2174 # $HOME exists, so only .ssh is new
   mkdir -p -m 700 "$HOME/.ssh"
   for rel in "${RETIRED_LINKS[@]}"; do
     if [[ -L $HOME/$rel ]]; then
@@ -208,6 +213,7 @@ new_ssh_key() {
   export SSH_KEY_PASSPHRASE
   ssh-keygen -q -t ed25519 -C "$(id -un)@$(scutil --get LocalHostName)" -f "$key" -N "$SSH_KEY_PASSPHRASE"
   askpass=$(mktemp)
+  # shellcheck disable=SC2016 # expanded by the askpass script, not here
   printf '#!/bin/sh\nprintf "%%s\\n" "$SSH_KEY_PASSPHRASE"\n' >"$askpass"
   chmod 700 "$askpass"
   SSH_ASKPASS=$askpass SSH_ASKPASS_REQUIRE=force ssh-add --apple-use-keychain "$key" </dev/null 2>/dev/null
@@ -217,6 +223,7 @@ new_ssh_key() {
 
 step_github() {
   local key="$HOME/.ssh/id_ed25519" pub keys url
+  # shellcheck disable=SC2174 # $HOME exists, so only .ssh is new
   mkdir -p -m 700 "$HOME/.ssh"
   if [[ -f $key ]]; then
     ssh-add --apple-use-keychain "$key" 2>/dev/null
@@ -299,6 +306,73 @@ step_checklist() {
 }
 
 ###############################################################################
+# Checks (./bootstrap --check): report drift without changing anything
+###############################################################################
+
+join_lines() { paste -sd, - | sed 's/,/, /g'; }
+
+check_links() {
+  local entry src rel dst
+  for rel in "${RETIRED_LINKS[@]}"; do
+    if [[ -L $HOME/$rel ]]; then
+      warn "~/$rel is a link from an older layout; run: ./bootstrap links"
+    fi
+  done
+  for entry in "${LINKS[@]}"; do
+    src="$REPO/${entry%%:*}"
+    rel="${entry#*:}"
+    dst="$HOME/$rel"
+    if [[ -L $dst && "$(readlink "$dst")" == "$src" ]]; then
+      ok "~/$rel"
+    elif [[ -L $dst ]]; then
+      warn "~/$rel links to $(readlink "$dst"), not $src; run: ./bootstrap links"
+    elif [[ -e $dst ]]; then
+      warn "~/$rel is a file of its own, not a link to the repo; run: ./bootstrap links"
+    else
+      warn "~/$rel is missing; run: ./bootstrap links"
+    fi
+  done
+}
+
+# Apps write through the links, so an edited dotfile shows up here.
+check_repo() {
+  local changed
+  changed=$(git -C "$REPO" status --porcelain | cut -c4- | join_lines)
+  if [[ -z $changed ]]; then
+    ok "No uncommitted changes"
+  else
+    warn "Uncommitted changes in $REPO: $changed. Commit or discard them."
+  fi
+}
+
+check_packages() {
+  local brewfiles missing listed extras
+  load_brew || { warn "Homebrew missing; run: ./bootstrap homebrew"; return; }
+  brewfiles=$(cat "$REPO/Brewfile")
+  if [[ -f $REPO/Brewfile.local ]]; then
+    brewfiles+=$'\n'$(cat "$REPO/Brewfile.local")
+  fi
+
+  if missing=$(brew bundle check --file=- --no-upgrade --verbose <<<"$brewfiles" 2>&1); then
+    ok "Everything in the Brewfile is installed"
+  else
+    missing=$(sed -n 's/^→ [A-Za-z]* \(.*\) needs to be installed.*/\1/p' <<<"$missing" | join_lines)
+    warn "Not installed: $missing. Run: ./bootstrap packages"
+  fi
+
+  # Dependencies aren't drift, so compare only what was installed by name.
+  # Names are compared without their tap prefix.
+  listed=$(brew bundle list --formula --cask --file=- <<<"$brewfiles" | sed 's|.*/||' | sort -u)
+  extras=$({ brew leaves --installed-on-request; brew list --cask; } | sed 's|.*/||' | sort -u |
+    comm -23 - <(printf '%s\n' "$listed") | join_lines)
+  if [[ -z $extras ]]; then
+    ok "Nothing installed outside the Brewfile"
+  else
+    warn "Installed but not in Brewfile or Brewfile.local: $extras. Add them, or remove them with brew uninstall."
+  fi
+}
+
+###############################################################################
 # Main
 ###############################################################################
 
@@ -320,6 +394,19 @@ fi
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 load_brew || true
+
+if [[ $1 == --check ]]; then
+  say "links";    check_links
+  say "repo";     check_repo
+  say "packages"; check_packages
+  if [[ ${#WARNINGS[@]} -gt 0 ]]; then
+    say "Drift found"
+    for w in "${WARNINGS[@]}"; do printf '  ! %s\n' "$w"; done
+    exit 1
+  fi
+  say "No drift"
+  exit 0
+fi
 
 if [[ $# -eq 0 ]]; then
   set -- "${STEPS[@]}"

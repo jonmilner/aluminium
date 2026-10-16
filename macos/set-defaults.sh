@@ -11,5 +11,6 @@ osascript -e 'tell application "System Settings" to quit'
 dir="$(cd "$(dirname "$0")" && pwd)"
 
 for f in "$dir"/apps/*.sh "$dir"/system/*.sh; do
+  # shellcheck source=/dev/null # each script is checked on its own
   source "$f"
 done

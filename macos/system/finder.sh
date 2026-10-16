@@ -107,7 +107,7 @@ defaults export com.apple.finder "$finder_plist" 2>/dev/null || plutil -create x
 # pb_set <Key:Nested:Path> <type> <value>
 # Creates missing parent dicts, which a new Mac doesn't have yet.
 pb_set() {
-  local key=$1 type=$2 value=$3 parent= part parts
+  local key=$1 type=$2 value=$3 parent='' part parts
   /usr/libexec/PlistBuddy -c "Set \":$key\" $value" "$finder_plist" 2>/dev/null && return
   IFS=: read -r -a parts <<<"$key"
   for part in "${parts[@]:0:${#parts[@]}-1}"; do
@@ -151,6 +151,7 @@ rm -f "$finder_plist"
 mkdir -p "$HOME/Library/Mobile Documents/com~apple~CloudDocs/Screenshots"
 
 echo "∙ Sidebar favorites and locations"
+# shellcheck disable=SC2154 # dir is set by set-defaults.sh, which sources this file
 /usr/bin/python3 -I "$dir/lib/finder-sidebar.py"
 
 # Per-folder views. Finder remembers each folder's last view, and treats a view

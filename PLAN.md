@@ -86,8 +86,8 @@ Target: finish Setup Assistant, open Terminal, paste one command, answer two pro
 - [x] Touch ID for `sudo` (`/etc/pam.d/sudo_local`), so the password prompt becomes a fingerprint on later runs (phase 4, `security-privacy.sh`).
 
 ### 6. Prevent drift
-- `bootstrap --check`: report unlinked or modified files and Brewfile differences without changing anything.
-- ShellCheck in a pre-commit hook or GitHub Action.
+- [x] `bootstrap --check`: reports unlinked dotfiles, uncommitted changes in the repo, and Brewfile packages missing or installed outside it. Changes nothing; exits 1 on drift.
+- [x] ShellCheck: `scripts/lint`, run by a GitHub Action on pushes to `main` and on PRs. A pre-commit hook was passed over: the Action needs no setup on each Mac.
 
 ### 7. Agents: Claude Code and jonai
 Goal: a new Mac comes out of `bootstrap` with Claude Code and the jonai skills, agents, hooks and instructions installed, with no extra commands.

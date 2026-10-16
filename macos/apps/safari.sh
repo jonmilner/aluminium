@@ -7,6 +7,7 @@ echo "Safari"
 # Safari is sandboxed: it reads its settings from its container, not from
 # ~/Library/Preferences. Writing there needs Full Disk Access for the terminal.
 safari="$HOME/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari"
+# shellcheck disable=SC2154 # dir is set by set-defaults.sh, which sources this file
 if ! "$dir/lib/has-full-disk-access"; then
   echo "  ! Skipped: needs Full Disk Access for this terminal"
   return 0

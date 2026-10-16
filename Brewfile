@@ -5,6 +5,7 @@
 # CLI
 brew "gh"
 brew "gitleaks"
+brew "shellcheck"
 
 # Shell
 brew "fzf"

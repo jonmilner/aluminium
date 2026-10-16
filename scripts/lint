@@ -1,0 +1,16 @@
+#!/bin/bash
+# Run ShellCheck on every bash script in the repo, as CI does.
+# zsh files are skipped: ShellCheck doesn't support zsh.
+
+set -eo pipefail
+cd "$(dirname "$0")/.."
+
+files=()
+while IFS= read -r f; do
+  if head -n 1 "$f" | grep -qE '^#!.*[/ ](ba)?sh$'; then
+    files+=("$f")
+  fi
+done < <(git ls-files)
+
+shellcheck "${files[@]}"
+echo "ShellCheck: ${#files[@]} scripts clean"
