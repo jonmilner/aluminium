@@ -61,6 +61,9 @@ defaults write com.apple.finder FXPreferredViewStyle -string clmv
 defaults write com.apple.finder FXPreferredGroupBy -string "Kind"
 defaults write com.apple.finder FXArrangeGroupViewBy -string "Name"
 
+echo "∙ Column view: don't resize columns to fit filenames"
+defaults write com.apple.finder _FXEnableColumnAutoSizing -bool false
+
 echo "∙ Sidebar: hide Recent Tags"
 defaults write com.apple.finder ShowRecentTags -bool false
 
