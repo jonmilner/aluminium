@@ -15,6 +15,7 @@ brew "zsh-syntax-highlighting"
 
 # macOS
 brew "dockutil"
+brew "duti"
 
 # Apps
 cask "1password"

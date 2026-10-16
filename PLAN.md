@@ -55,9 +55,24 @@ Ready to merge after phase 3. See "First run on an existing Mac" in the README.
 - Tested in a throwaway `$HOME`: the shell loads with no errors other than Pure, which isn't installed via Homebrew yet. Pure loads once it's on `fpath`.
 
 ### 4. Refresh macOS defaults
-- Check every key against macOS 26 and remove dead ones (Dashboard hot corner, `AppleFontSmoothing`, `QLEnableTextSelection`, `EmptyTrashSecurely`, Safari keys that are now sandboxed, "System Preferences" references).
-- Rebuild the Dock with `dockutil` from a list of apps that are actually installed.
-- Drop the Simulator symlink unless full Xcode is in the Brewfile.
+- [x] Checked every key against macOS 26.6 (`strings` on Dock, Finder and the dyld shared cache). Removed: `AppleFontSmoothing`, `QLEnableTextSelection`, `EmptyTrashSecurely`, `expose-animation-duration`, `spctl --master-disable` (needs manual approval since Sequoia, and lowers security), the Simulator symlink. "System Preferences" is now "System Settings".
+- [x] Dock: no longer cleared and rebuilt. Once per Mac (marker: `~/.local/state/aluminium/dock-cleaned`), removes the apps macOS adds to the Dock (read from the Dock's own `default*.plist` and `dockfixup*.plist`, so future macOS defaults are covered) except Finder, Safari, Messages, Photos and System Settings. Adds each Brewfile/Brewfile.local app that's missing (by bundle ID, via `dockutil`), skipping menu bar utilities and VLC. Never touches apps you added yourself, and never reorders. Fades hidden apps (`showhidden`: only `showHiddenState` is in the Dock binary, so this is checked by eye, not by strings).
+- [x] Safari: settings now go to its sandbox container (needs Full Disk Access; `bootstrap` warns and opens the pane if missing). Dropped the keys absent from Safari and the dyld cache: Java, plug-ins, Do Not Track, `InstallExtensionUpdatesAutomatically`.
+- [x] Startup sound: `SystemAudioVolume` does nothing on Apple silicon; now `nvram StartupMute=%01`, the variable System Settings' Sound pane uses.
+- [x] Spotlight's ⌘Space shortcut is turned off for Raycast.
+- [x] `macos` runs by default. Where the scripts and this Mac differed (Dock size, spring-loading delay, Finder grouping and new-window target, App Store auto-update, currency), the scripts win.
+- [x] Finder: column view grouped by Kind, sorted by Name. Nested settings (Desktop, icon view, toolbar) now go through `defaults export`/`import` with an add-or-set helper, instead of PlistBuddy on the live plist (cfprefsd could overwrite it; `Set` failed on a new Mac).
+- [x] Sidebar favorites and Locations: `macos/lib/finder-sidebar.py` (LSSharedFileList via ctypes; `--dry-run` compares only). Tested on 26.6: removes extras, then moves/adds each target item in place (inserting an existing item moves it). Never removes a target item, because some can't be re-added: `/` must be added via its `/Volumes` link, and cloud-provider folders (SynologyDrive) can't be added by this API at all, only by dragging in Finder.
+- [x] Menu bar: per-module values in `-currentHost com.apple.controlcenter` (18 shown, 24 Control Center only); the `NSStatusItem VisibleCC` keys are a cache Control Center overwrites. Battery (with percentage) shown; Wi-Fi, Sound, Bluetooth, Focus, Now Playing hidden; Spotlight hidden (`-currentHost com.apple.Spotlight MenuItemHidden`). Fast User Switching left at the default.
+- [x] Energy: on power, never sleep by itself (`pmset -c sleep 0`), laptops and desktops; display sleep, battery and lid-closed behaviour unchanged.
+- [x] Dock fade for hidden apps (`showhidden`) confirmed working on 26.6 by eye.
+- [x] Menu bar never auto-hides.
+- [x] Per-folder views: Finder remembers each folder's last view (in the parent's `.DS_Store`) and turns any view change into the new global default. `macos/lib/finder-reset.sh` deletes the remembered views under `~` (not `~/Library`) and force-quits Finder (a normal quit writes them back); then `finder.sh` sets the exceptions (Downloads: column, since macOS defaults it to list; Screenshots: list, newest first; Applications: list by Name) and the global defaults again. Verified twice end to end on this Mac.
+- [ ] Optional: reset remembered Finder views automatically at login. A LaunchAgent would need access to Desktop/Documents/Downloads (TCC) and Finder automation, so for now it runs with `./bootstrap macos`.
+- [x] Clock, trackpad secondary click, keyboard navigation, dark mode, typing aids off, Dock minimize, WindowManager, Touch ID sudo, firewall, default apps (`duti`), computer name (`name` step).
+- [x] Desktop widgets stay shown (`StandardHideWidgets` false).
+- [ ] Mouse buttons 4 and 5 → Show Desktop and Mission Control (`assets/mission-control-mouse-setup.png`): stored as `type = button` entries in `com.apple.symbolichotkeys`, but the button numbering is unverified. Set it once in System Settings with a multi-button mouse, read back keys 32 and 36, then script it.
+- Unverified keys kept (harmless if ignored): clock `DateFormat`, `mru-spaces`, `NSNavPanelExpandedStateForSaveMode2`, CrashReporter `DialogType`, `askForPassword`, printing keys, `include-date`, `DoNotOfferNewDisksForBackup`, `DSDontWriteUSBStores`, `OpenWindowForNewRemovableDisk`, `disableHotPlug`, iWork and Chrome keys.
 
 ### 5. New-Mac experience and manual steps
 Target: finish Setup Assistant, open Terminal, paste one command, answer two prompts in the first minute, walk away.
@@ -67,8 +82,8 @@ Target: finish Setup Assistant, open Terminal, paste one command, answer two pro
 - [x] `packages` checks App Management permission before adopting hand-installed apps (existing Macs only).
 - [x] Every manual step is in the README (before, during, after, existing-Mac only). `bootstrap` prints the "after" checklist from the README, so there's one copy.
 - [ ] Verify on a fresh Mac or a new macOS user account: the `softwareupdate` label parsing, whether the Vite+ installer still prompts with `VP_NODE_MANAGER=yes`, and whether macOS asks before Terminal touches iCloud Drive.
-- [ ] Phase 4 adds any permissions the defaults scripts need (e.g. Full Disk Access for Terminal) to the README.
-- [ ] Optional: Touch ID for `sudo` (`/etc/pam.d/sudo_local`), so the password prompt becomes a fingerprint on later runs.
+- [x] Phase 4 adds any permissions the defaults scripts need to the README. Full Disk Access for Safari and the Finder view reset (README and checklist); the rest uses sudo, which `bootstrap` already asks for.
+- [x] Touch ID for `sudo` (`/etc/pam.d/sudo_local`), so the password prompt becomes a fingerprint on later runs (phase 4, `security-privacy.sh`).
 
 ### 6. Prevent drift
 - `bootstrap --check`: report unlinked or modified files and Brewfile differences without changing anything.

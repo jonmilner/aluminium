@@ -4,5 +4,5 @@
 echo "General"
 ###############################################################################
 
-echo "∙ Automatically hide and show the menu bar"
-defaults write NSGlobalDomain "_HIHideMenuBar" -bool true
+echo "∙ Never hide the menu bar"
+defaults write NSGlobalDomain "_HIHideMenuBar" -bool false

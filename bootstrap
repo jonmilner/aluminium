@@ -31,9 +31,7 @@ LINKS=(
 RETIRED_LINKS=(.gitignore .hyper.js)
 
 # Interactive steps come first (password, GitHub sign-in); the rest runs unattended.
-# `macos` runs only when named until its scripts are refreshed (PLAN.md phase 4).
-DEFAULT_STEPS=(xcode homebrew github packages vite links secrets checklist)
-ALL_STEPS=(xcode homebrew github packages vite links secrets macos checklist)
+STEPS=(name xcode homebrew github packages vite links secrets macos checklist)
 
 WARNINGS=()
 
@@ -42,7 +40,7 @@ ok()   { printf '  ✓ %s\n' "$*"; }
 warn() { printf '  \033[33m! %s\033[0m\n' "$*" >&2; WARNINGS+=("$*"); }
 
 # Steps that use sudo, so they need an administrator account.
-SUDO_STEPS=" xcode homebrew packages macos "
+SUDO_STEPS=" name xcode homebrew packages macos "
 
 require_admin() {
   id -Gn | tr ' ' '\n' | grep -qx admin && return
@@ -78,6 +76,26 @@ load_brew() {
 ###############################################################################
 # Steps
 ###############################################################################
+
+# Asks once per Mac. Enter keeps the current name.
+step_name() {
+  local marker="$HOME/.local/state/aluminium/named" name host input
+  [[ -e $marker ]] && return
+  need_sudo
+  name=$(scutil --get ComputerName)
+  read -r -p "  Name for this Mac [$name]: " input || true
+  name=${input:-$name}
+  # Hostnames allow letters, digits and hyphens only. iconv turns é into 'e and
+  # drops what it can't convert; a name with nothing left keeps the current one.
+  host=$(printf '%s' "$name" | sed "s/[’']//g" | { iconv -c -f utf-8 -t ascii//TRANSLIT 2>/dev/null || true; } |
+    tr -d "\"'\`^~" | tr -cs 'A-Za-z0-9' '-' | sed 's/^-*//; s/-*$//')
+  host=${host:-$(scutil --get LocalHostName)}
+  sudo scutil --set ComputerName "$name"
+  sudo scutil --set LocalHostName "$host"
+  sudo scutil --set HostName "$host"
+  mkdir -p "${marker%/*}" && touch "$marker"
+  ok "This Mac is $name ($host.local)"
+}
 
 step_xcode() {
   local flag=/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress label
@@ -260,7 +278,17 @@ step_secrets() {
 step_macos() {
   need_sudo
   bash "$REPO/macos/set-defaults.sh"
-  killall Dock Finder SystemUIServer 2>/dev/null || true
+  # Safari's settings (in its sandbox container) and the Finder view reset need
+  # Full Disk Access. macos/apps/safari.sh and macos/system/finder.sh skip them without it.
+  if ! "$REPO/macos/lib/has-full-disk-access"; then
+    warn "Safari settings and Finder view reset skipped: turn on this terminal in System Settings → Privacy & Security → Full Disk Access, reopen it, then run: ./bootstrap macos"
+    open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles" 2>/dev/null || true
+  elif [[ ! -d ~/Library/Containers/com.apple.Safari/Data/Library/Preferences ]]; then
+    warn "Safari settings skipped: open Safari once, then run: ./bootstrap macos"
+  fi
+  # Applies keyboard shortcut changes without logging out.
+  /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u 2>/dev/null || true
+  killall Dock Finder SystemUIServer ControlCenter Spotlight 2>/dev/null || true
   ok "macOS defaults applied"
 }
 
@@ -294,11 +322,11 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 load_brew || true
 
 if [[ $# -eq 0 ]]; then
-  set -- "${DEFAULT_STEPS[@]}"
+  set -- "${STEPS[@]}"
 fi
 for s in "$@"; do
   if ! declare -F "step_$s" >/dev/null; then
-    echo "Unknown step: $s. Steps: ${ALL_STEPS[*]}" >&2
+    echo "Unknown step: $s. Steps: ${STEPS[*]}" >&2
     exit 1
   fi
 done

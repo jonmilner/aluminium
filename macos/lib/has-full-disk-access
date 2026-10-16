@@ -1,0 +1,4 @@
+#!/bin/bash
+# Succeeds if this terminal has Full Disk Access. Every Mac has this folder, and
+# only Full Disk Access can read it.
+ls "$HOME/Library/Application Support/com.apple.TCC" >/dev/null 2>&1

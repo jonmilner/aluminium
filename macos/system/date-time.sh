@@ -5,8 +5,10 @@ echo "Date & Time"
 ###############################################################################
 
 echo "∙ Format menu bar clock"
-# "h:mm" Default
-# "HH"   Use a 24-hour clock
-# "a"    Show AM/PM
-# "ss"   Display the time with seconds
-defaults write com.apple.menuextra.clock DateFormat -string "EEE MMM d h:mm:ss a"
+# e.g. "Tue Oct 14 7:58:09 AM". DateFormat is no longer read.
+defaults write com.apple.menuextra.clock IsAnalog -bool false
+defaults write com.apple.menuextra.clock ShowDayOfWeek -bool true
+defaults write com.apple.menuextra.clock ShowDate -int 1 # 0 when space allows, 1 always, 2 never
+defaults write com.apple.menuextra.clock ShowSeconds -bool true
+defaults write com.apple.menuextra.clock Show24Hour -bool false
+defaults write com.apple.menuextra.clock ShowAMPM -bool true

@@ -1,10 +1,8 @@
 #!/bin/bash
 
 ###############################################################################
-echo "Displays"
+echo "Appearance"
 ###############################################################################
 
-echo "∙ Enable sub-pixel rendering on non-Apple LCDs."
-defaults write NSGlobalDomain AppleFontSmoothing -int 2
-
-
+echo "∙ Dark mode"
+defaults write NSGlobalDomain AppleInterfaceStyle -string Dark
