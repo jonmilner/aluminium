@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 
 files=()
 while IFS= read -r f; do
-  if head -n 1 "$f" | grep -qE '^#!.*[/ ](ba)?sh$'; then
+  if head -n 1 "$f" | grep -qE '^#!.*[/ ](ba)?sh( |$)'; then
     files+=("$f")
   fi
 done < <(git ls-files)

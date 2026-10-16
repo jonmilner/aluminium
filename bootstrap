@@ -176,6 +176,8 @@ step_vite() {
   ok "Vite+ installed"
 }
 
+is_linked() { [[ -L $1 && "$(readlink "$1")" == "$2" ]]; }
+
 step_links() {
   local entry src rel dst stamp
   stamp=$(date +%Y%m%d-%H%M%S)
@@ -191,7 +193,7 @@ step_links() {
     src="$REPO/${entry%%:*}"
     rel="${entry#*:}"
     dst="$HOME/$rel"
-    if [[ -L $dst && "$(readlink "$dst")" == "$src" ]]; then
+    if is_linked "$dst" "$src"; then
       ok "~/$rel"
       continue
     fi
@@ -322,7 +324,7 @@ check_links() {
     src="$REPO/${entry%%:*}"
     rel="${entry#*:}"
     dst="$HOME/$rel"
-    if [[ -L $dst && "$(readlink "$dst")" == "$src" ]]; then
+    if is_linked "$dst" "$src"; then
       ok "~/$rel"
     elif [[ -L $dst ]]; then
       warn "~/$rel links to $(readlink "$dst"), not $src; run: ./bootstrap links"
@@ -336,8 +338,12 @@ check_links() {
 
 # Apps write through the links, so an edited dotfile shows up here.
 check_repo() {
-  local changed
-  changed=$(git -C "$REPO" status --porcelain | cut -c4- | join_lines)
+  local status changed
+  if ! status=$(git -C "$REPO" status --porcelain 2>&1); then
+    warn "git status failed in $REPO: $status"
+    return
+  fi
+  changed=$(cut -c4- <<<"$status" | sed '/^$/d' | join_lines)
   if [[ -z $changed ]]; then
     ok "No uncommitted changes"
   else
@@ -356,13 +362,20 @@ check_packages() {
   if missing=$(brew bundle check --file=- --no-upgrade --verbose <<<"$brewfiles" 2>&1); then
     ok "Everything in the Brewfile is installed"
   else
-    missing=$(sed -n 's/^→ [A-Za-z]* \(.*\) needs to be installed.*/\1/p' <<<"$missing" | join_lines)
-    warn "Not installed: $missing. Run: ./bootstrap packages"
+    # One "→ Cask iina needs to be installed." line per problem; anything else
+    # (a Brewfile error, say) is shown as is.
+    missing=$(printf "%s\n" "$missing" | sed -n "/^→ /{s/^→ //;s/\.$//;p;}" | join_lines)
+    warn "brew bundle check: ${missing:-failed (run it with --verbose to see why)}. Run: ./bootstrap packages"
   fi
 
   # Dependencies aren't drift, so compare only what was installed by name.
-  # Names are compared without their tap prefix.
-  listed=$(brew bundle list --formula --cask --file=- <<<"$brewfiles" | sed 's|.*/||' | sort -u)
+  # Names are compared without their tap prefix. Brewfile entries need their
+  # full name (python@3.13, not python) to match.
+  if ! listed=$(brew bundle list --formula --cask --file=- <<<"$brewfiles" 2>&1); then
+    warn "brew bundle list failed: $listed"
+    return
+  fi
+  listed=$(printf "%s\n" "$listed" | sed "s|.*/||" | sort -u)
   extras=$({ brew leaves --installed-on-request; brew list --cask; } | sed 's|.*/||' | sort -u |
     comm -23 - <(printf '%s\n' "$listed") | join_lines)
   if [[ -z $extras ]]; then
