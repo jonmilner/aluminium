@@ -2,6 +2,8 @@
 
 Goal: clone this repo on a new Mac, run one script, and have very little manual setup left. Re-running the same script keeps existing Macs in sync.
 
+Open work is tracked in [GitHub issues](https://github.com/jonmilner/aluminium/issues). Unchecked items below link to theirs.
+
 ## Decisions
 
 | Topic | Decision |
@@ -68,11 +70,11 @@ Ready to merge after phase 3. See "First run on an existing Mac" in the README.
 - [x] Dock fade for hidden apps (`showhidden`) confirmed working on 26.6 by eye.
 - [x] Menu bar never auto-hides.
 - [x] Per-folder views: Finder remembers each folder's last view (in the parent's `.DS_Store`) and turns any view change into the new global default. `macos/lib/finder-reset.sh` deletes the remembered views under `~` (not `~/Library`) and force-quits Finder (a normal quit writes them back); then `finder.sh` sets the exceptions (Downloads: column, since macOS defaults it to list; Screenshots: list, newest first; Applications: list by Name) and the global defaults again. Verified twice end to end on this Mac.
-- [ ] Optional: reset remembered Finder views automatically at login. A LaunchAgent would need access to Desktop/Documents/Downloads (TCC) and Finder automation, so for now it runs with `./bootstrap macos`.
+- [ ] Optional: reset remembered Finder views automatically at login. A LaunchAgent would need access to Desktop/Documents/Downloads (TCC) and Finder automation, so for now it runs with `./bootstrap macos`. Tracked in [#34](https://github.com/jonmilner/aluminium/issues/34).
 - [x] Clock, trackpad secondary click, keyboard navigation, dark mode, typing aids off, Dock minimize, WindowManager, Touch ID sudo, firewall, default apps (`duti`), computer name (`name` step).
 - [x] Desktop widgets stay shown (`StandardHideWidgets` false).
-- [ ] Mouse buttons 4 and 5 → Show Desktop and Mission Control (`assets/mission-control-mouse-setup.png`): stored as `type = button` entries in `com.apple.symbolichotkeys`, but the button numbering is unverified. Set it once in System Settings with a multi-button mouse, read back keys 32 and 36, then script it.
-- Unverified keys kept (harmless if ignored): clock `DateFormat`, `mru-spaces`, `NSNavPanelExpandedStateForSaveMode2`, CrashReporter `DialogType`, `askForPassword`, printing keys, `include-date`, `DoNotOfferNewDisksForBackup`, `DSDontWriteUSBStores`, `OpenWindowForNewRemovableDisk`, `disableHotPlug`, iWork and Chrome keys.
+- [ ] Mouse buttons 4 and 5 → Show Desktop and Mission Control (`assets/mission-control-mouse-setup.png`): stored as `type = button` entries in `com.apple.symbolichotkeys`, but the button numbering is unverified. Set it once in System Settings with a multi-button mouse, read back keys 32 and 36, then script it. Tracked in [#33](https://github.com/jonmilner/aluminium/issues/33).
+- Unverified keys kept (harmless if ignored): clock `DateFormat`, `mru-spaces`, `NSNavPanelExpandedStateForSaveMode2`, CrashReporter `DialogType`, `askForPassword`, printing keys, `include-date`, `DoNotOfferNewDisksForBackup`, `DSDontWriteUSBStores`, `OpenWindowForNewRemovableDisk`, `disableHotPlug`, iWork and Chrome keys. Read-back check: [#29](https://github.com/jonmilner/aluminium/issues/29); `askForPassword`: [#12](https://github.com/jonmilner/aluminium/issues/12).
 
 ### 5. New-Mac experience and manual steps
 Target: finish Setup Assistant, open Terminal, paste one command, answer two prompts in the first minute, walk away.
@@ -81,7 +83,7 @@ Target: finish Setup Assistant, open Terminal, paste one command, answer two pro
 - [x] `github` step (was `ssh`) runs before `packages`, installs `gh` itself, and asks for the key-upload scope at sign-in, so there's one browser approval, not two.
 - [x] `packages` checks App Management permission before adopting hand-installed apps (existing Macs only).
 - [x] Every manual step is in the README (before, during, after, existing-Mac only). `bootstrap` prints the "after" checklist from the README, so there's one copy.
-- [ ] Verify on a fresh Mac or a new macOS user account: the `softwareupdate` label parsing, whether the Vite+ installer still prompts with `VP_NODE_MANAGER=yes`, and whether macOS asks before Terminal touches iCloud Drive.
+- [ ] Verify on a fresh Mac or a new macOS user account: the `softwareupdate` label parsing, whether the Vite+ installer still prompts with `VP_NODE_MANAGER=yes`, and whether macOS asks before Terminal touches iCloud Drive. Tracked in [#31](https://github.com/jonmilner/aluminium/issues/31).
 - [x] Phase 4 adds any permissions the defaults scripts need to the README. Full Disk Access for Safari and the Finder view reset (README and checklist); the rest uses sudo, which `bootstrap` already asks for.
 - [x] Touch ID for `sudo` (`/etc/pam.d/sudo_local`), so the password prompt becomes a fingerprint on later runs (phase 4, `security-privacy.sh`).
 
@@ -90,7 +92,7 @@ Target: finish Setup Assistant, open Terminal, paste one command, answer two pro
 - ShellCheck in a pre-commit hook or GitHub Action.
 
 ### 7. Agents: Claude Code and jonai
-Goal: a new Mac comes out of `bootstrap` with Claude Code and the jonai skills, agents, hooks and instructions installed, with no extra commands.
+Goal: a new Mac comes out of `bootstrap` with Claude Code and the jonai skills, agents, hooks and instructions installed, with no extra commands. Tracked in [#32](https://github.com/jonmilner/aluminium/issues/32).
 
 Proposed `agents` step, after `github` (jonai is private, so cloning needs the SSH key) and `secrets`:
 1. Install Claude Code with its native installer if `claude` is missing (matches this Mac: `~/.local/bin/claude`, which updates itself).
@@ -108,7 +110,7 @@ Open:
 - Optional: clone your other projects into `~/git` from a list.
 
 ### 8. Automated testing
-A `scripts/test` command that runs unit tests, and an end-to-end test that boots a clean macOS VM (Tart) of a chosen version, runs `bootstrap`, checks the result and deletes the VM. Full plan: [docs/plans/automated-testing.md](docs/plans/automated-testing.md).
+A `scripts/test` command that runs unit tests, and an end-to-end test that boots a clean macOS VM (Tart) of a chosen version, runs `bootstrap`, checks the result and deletes the VM. Full plan: [docs/plans/automated-testing.md](docs/plans/automated-testing.md). Tracked in [#37](https://github.com/jonmilner/aluminium/issues/37) (unverified facts), [#35](https://github.com/jonmilner/aluminium/issues/35) (unattended mode), [#36](https://github.com/jonmilner/aluminium/issues/36) (unit tests), [#38](https://github.com/jonmilner/aluminium/issues/38) (end-to-end) and [#39](https://github.com/jonmilner/aluminium/issues/39) (extra scenarios).
 
 ## Known bugs in the current scripts
 Fixed by the rewrite. Listed so none come back:
