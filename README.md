@@ -61,9 +61,15 @@ cd ~/aluminium && git pull && ./bootstrap
 
 Run single steps by name, e.g. `./bootstrap links github`. `./bootstrap macos` also makes Finder forget per-folder views you changed by hand (it force-quits Finder, so let file copies finish first). Steps, in order: `name`, `xcode`, `homebrew`, `github`, `packages`, `vite`, `links`, `secrets`, `macos`, `checklist`.
 
+### Checking for drift
+
+`./bootstrap --check` changes nothing. It reports dotfiles that aren't linked to the repo, uncommitted changes in the repo (apps write through the links, so an edited dotfile shows up here), Brewfile packages that aren't installed, and packages installed by name that aren't in `Brewfile` or `Brewfile.local`. It exits 1 if it finds any.
+
 ## Testing
 
 `scripts/test-vm [version]` opens a fresh macOS VM with copy and paste to and from this Mac (needs [Tart](https://tart.run); the first run downloads a ~28 GB image). Paste the `curl` command above into Terminal in the VM (it's logged in as `admin`, password `admin`). Closing the VM window or pressing Ctrl-C deletes the VM; `scripts/test-vm --clean` removes one left behind. To test a branch before it merges, put the branch name in the URL in place of `main` and pipe to `ALUMINIUM_REF=<branch> bash`. Automated tests are planned in [docs/plans/automated-testing.md](docs/plans/automated-testing.md).
+
+`scripts/lint` runs ShellCheck on every bash script. GitHub Actions runs it on each push to `main` and on each PR.
 
 ## Layout
 

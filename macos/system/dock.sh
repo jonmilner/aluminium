@@ -56,6 +56,7 @@ dock_skip=" bartender raycast vlc "
 echo "∙ Add Brewfile apps missing from the Dock"
 docked=$(dockutil --list --no-restart 2>/dev/null | cut -f5)
 casks=()
+# shellcheck disable=SC2154 # dir is set by set-defaults.sh, which sources this file
 for brewfile in "$dir/../Brewfile" "$dir/../Brewfile.local"; do
   [[ -f $brewfile ]] || continue
   for cask in $(brew bundle list --cask --file="$brewfile"); do

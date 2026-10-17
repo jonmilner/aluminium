@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2088 # "~/..." in messages is display text, not a path
 # Set up a new Mac, or re-sync an existing one. Safe to re-run.
 #
 #   ./bootstrap               run the default steps
 #   ./bootstrap links github  run only the named steps
+#   ./bootstrap --check       report drift (links, uncommitted changes, packages)
+#                             without changing anything; exits 1 if there is any
 #
 # New Mac (clones to ~/aluminium, or $ALUMINIUM_DIR):
 #   curl -fsSL https://raw.githubusercontent.com/jonmilner/aluminium/main/bootstrap | bash
@@ -138,6 +141,7 @@ can_modify_apps() {
   local app
   for app in /Applications/*.app; do
     [[ -O $app ]] || continue
+    # shellcheck disable=SC2154 # set by macOS for apps it launches, such as the terminal
     [[ $(defaults read "$app/Contents/Info" CFBundleIdentifier 2>/dev/null) == "$__CFBundleIdentifier" ]] && continue
     chgrp "$(stat -f %g "$app")" "$app" 2>/dev/null
     return
@@ -172,9 +176,12 @@ step_vite() {
   ok "Vite+ installed"
 }
 
+is_linked() { [[ -L $1 && "$(readlink "$1")" == "$2" ]]; }
+
 step_links() {
   local entry src rel dst stamp
   stamp=$(date +%Y%m%d-%H%M%S)
+  # shellcheck disable=SC2174 # $HOME exists, so only .ssh is new
   mkdir -p -m 700 "$HOME/.ssh"
   for rel in "${RETIRED_LINKS[@]}"; do
     if [[ -L $HOME/$rel ]]; then
@@ -186,7 +193,7 @@ step_links() {
     src="$REPO/${entry%%:*}"
     rel="${entry#*:}"
     dst="$HOME/$rel"
-    if [[ -L $dst && "$(readlink "$dst")" == "$src" ]]; then
+    if is_linked "$dst" "$src"; then
       ok "~/$rel"
       continue
     fi
@@ -208,6 +215,7 @@ new_ssh_key() {
   export SSH_KEY_PASSPHRASE
   ssh-keygen -q -t ed25519 -C "$(id -un)@$(scutil --get LocalHostName)" -f "$key" -N "$SSH_KEY_PASSPHRASE"
   askpass=$(mktemp)
+  # shellcheck disable=SC2016 # expanded by the askpass script, not here
   printf '#!/bin/sh\nprintf "%%s\\n" "$SSH_KEY_PASSPHRASE"\n' >"$askpass"
   chmod 700 "$askpass"
   SSH_ASKPASS=$askpass SSH_ASKPASS_REQUIRE=force ssh-add --apple-use-keychain "$key" </dev/null 2>/dev/null
@@ -217,6 +225,7 @@ new_ssh_key() {
 
 step_github() {
   local key="$HOME/.ssh/id_ed25519" pub keys url
+  # shellcheck disable=SC2174 # $HOME exists, so only .ssh is new
   mkdir -p -m 700 "$HOME/.ssh"
   if [[ -f $key ]]; then
     ssh-add --apple-use-keychain "$key" 2>/dev/null
@@ -299,13 +308,114 @@ step_checklist() {
 }
 
 ###############################################################################
+# Checks (./bootstrap --check): report drift without changing anything
+###############################################################################
+
+join_lines() { paste -sd, - | sed 's/,/, /g'; }
+
+# Runs a command and prints its stdout, or only its stderr if it fails, so
+# Homebrew's progress and warning lines don't end up in the output.
+stdout_or_stderr() {
+  local out err rc=0
+  err=$(mktemp)
+  out=$("$@" 2>"$err") || rc=$?
+  if ((rc == 0)); then printf '%s\n' "$out"; else cat "$err"; fi
+  rm -f "$err"
+  return "$rc"
+}
+
+# brew leaves would skip a formula installed by name once another depends on it.
+installed_by_name() { brew list --formula --installed-on-request && brew list --cask; }
+
+check_links() {
+  local entry src rel dst
+  for rel in "${RETIRED_LINKS[@]}"; do
+    if [[ -L $HOME/$rel ]]; then
+      warn "~/$rel is a link from an older layout; run: ./bootstrap links"
+    fi
+  done
+  for entry in "${LINKS[@]}"; do
+    src="$REPO/${entry%%:*}"
+    rel="${entry#*:}"
+    dst="$HOME/$rel"
+    if is_linked "$dst" "$src"; then
+      ok "~/$rel"
+    elif [[ -L $dst ]]; then
+      warn "~/$rel links to $(readlink "$dst"), not $src; run: ./bootstrap links"
+    elif [[ -e $dst ]]; then
+      warn "~/$rel is a file of its own, not a link to the repo; run: ./bootstrap links"
+    else
+      warn "~/$rel is missing; run: ./bootstrap links"
+    fi
+  done
+}
+
+# Apps write through the links, so an edited dotfile shows up here.
+check_repo() {
+  local status changed
+  if ! status=$(git -C "$REPO" status --porcelain 2>&1); then
+    warn "git status failed in $REPO: $status"
+    return
+  fi
+  changed=$(cut -c4- <<<"$status" | sed '/^$/d' | join_lines)
+  if [[ -z $changed ]]; then
+    ok "No uncommitted changes"
+  else
+    warn "Uncommitted changes in $REPO: $changed. Commit or discard them."
+  fi
+}
+
+check_packages() {
+  local brewfiles output missing listed installed extras
+  load_brew || { warn "Homebrew missing; run: ./bootstrap homebrew"; return; }
+  brewfiles=$(cat "$REPO/Brewfile")
+  if [[ -f $REPO/Brewfile.local ]]; then
+    brewfiles+=$'\n'$(cat "$REPO/Brewfile.local")
+  fi
+
+  if output=$(brew bundle check --file=- --no-upgrade --verbose <<<"$brewfiles" 2>&1); then
+    ok "Everything in the Brewfile is installed"
+  else
+    # One "→ Cask iina needs to be installed." line per problem; anything else
+    # (a Brewfile error, say) is shown as is.
+    missing=$(printf "%s\n" "$output" | sed -n "/^→ /{s/^→ //;s/\.$//;p;}" | join_lines)
+    warn "brew bundle check: ${missing:-$output}. Run: ./bootstrap packages"
+  fi
+
+  # Dependencies aren't drift, so compare only what was installed by name.
+  # Names are compared without their tap prefix. Brewfile entries need their
+  # full name (python@3.13, not python) to match.
+  if ! listed=$(stdout_or_stderr brew bundle list --formula --cask --file=- <<<"$brewfiles"); then
+    warn "brew bundle list failed: $listed"
+    return
+  fi
+  if ! installed=$(stdout_or_stderr installed_by_name); then
+    warn "brew list failed: $installed"
+    return
+  fi
+  listed=$(printf "%s\n" "$listed" | sed "s|.*/||" | sort -u)
+  extras=$(printf "%s\n" "$installed" | sed 's|.*/||' | sort -u |
+    comm -23 - <(printf '%s\n' "$listed") | join_lines)
+  if [[ -z $extras ]]; then
+    ok "Nothing installed outside the Brewfile"
+  else
+    warn "Installed but not in Brewfile or Brewfile.local: $extras. Add them, or remove them with brew uninstall."
+  fi
+}
+
+###############################################################################
 # Main
 ###############################################################################
 
 # Piped from curl: fetch the repo, then run its copy of this script.
 if [[ ! -f ${BASH_SOURCE[0]} ]]; then
-  require_admin
   dir="${ALUMINIUM_DIR:-$HOME/aluminium}"
+  # --check changes nothing, so it skips the installs below.
+  if [[ " $* " == *" --check "* ]]; then
+    [[ -e $dir/.git ]] || { echo "Nothing to check: no repo at $dir" >&2; exit 1; }
+    exec "$dir/bootstrap" "$@"
+  fi
+  require_admin
   say "xcode"
   step_xcode
   if [[ ! -e $dir/.git ]]; then
@@ -320,6 +430,23 @@ fi
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 load_brew || true
+
+if [[ " $* " == *" --check "* ]]; then
+  if [[ $# -ne 1 ]]; then
+    echo "--check runs every check; it takes no steps." >&2
+    exit 1
+  fi
+  say "links";    check_links
+  say "repo";     check_repo
+  say "packages"; check_packages
+  if [[ ${#WARNINGS[@]} -gt 0 ]]; then
+    say "Drift found"
+    for w in "${WARNINGS[@]}"; do printf '  ! %s\n' "$w"; done
+    exit 1
+  fi
+  say "No drift"
+  exit 0
+fi
 
 if [[ $# -eq 0 ]]; then
   set -- "${STEPS[@]}"
