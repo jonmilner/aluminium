@@ -313,6 +313,20 @@ step_checklist() {
 
 join_lines() { paste -sd, - | sed 's/,/, /g'; }
 
+# Runs a command and prints its stdout, or only its stderr if it fails, so
+# Homebrew's progress and warning lines don't end up in the output.
+stdout_or_stderr() {
+  local out err rc=0
+  err=$(mktemp)
+  out=$("$@" 2>"$err") || rc=$?
+  if ((rc == 0)); then printf '%s\n' "$out"; else cat "$err"; fi
+  rm -f "$err"
+  return "$rc"
+}
+
+# brew leaves would skip a formula installed by name once another depends on it.
+installed_by_name() { brew list --formula --installed-on-request && brew list --cask; }
+
 check_links() {
   local entry src rel dst
   for rel in "${RETIRED_LINKS[@]}"; do
@@ -352,31 +366,35 @@ check_repo() {
 }
 
 check_packages() {
-  local brewfiles missing listed extras
+  local brewfiles output missing listed installed extras
   load_brew || { warn "Homebrew missing; run: ./bootstrap homebrew"; return; }
   brewfiles=$(cat "$REPO/Brewfile")
   if [[ -f $REPO/Brewfile.local ]]; then
     brewfiles+=$'\n'$(cat "$REPO/Brewfile.local")
   fi
 
-  if missing=$(brew bundle check --file=- --no-upgrade --verbose <<<"$brewfiles" 2>&1); then
+  if output=$(brew bundle check --file=- --no-upgrade --verbose <<<"$brewfiles" 2>&1); then
     ok "Everything in the Brewfile is installed"
   else
     # One "→ Cask iina needs to be installed." line per problem; anything else
     # (a Brewfile error, say) is shown as is.
-    missing=$(printf "%s\n" "$missing" | sed -n "/^→ /{s/^→ //;s/\.$//;p;}" | join_lines)
-    warn "brew bundle check: ${missing:-failed (run it with --verbose to see why)}. Run: ./bootstrap packages"
+    missing=$(printf "%s\n" "$output" | sed -n "/^→ /{s/^→ //;s/\.$//;p;}" | join_lines)
+    warn "brew bundle check: ${missing:-$output}. Run: ./bootstrap packages"
   fi
 
   # Dependencies aren't drift, so compare only what was installed by name.
   # Names are compared without their tap prefix. Brewfile entries need their
   # full name (python@3.13, not python) to match.
-  if ! listed=$(brew bundle list --formula --cask --file=- <<<"$brewfiles" 2>&1); then
+  if ! listed=$(stdout_or_stderr brew bundle list --formula --cask --file=- <<<"$brewfiles"); then
     warn "brew bundle list failed: $listed"
     return
   fi
+  if ! installed=$(stdout_or_stderr installed_by_name); then
+    warn "brew list failed: $installed"
+    return
+  fi
   listed=$(printf "%s\n" "$listed" | sed "s|.*/||" | sort -u)
-  extras=$({ brew leaves --installed-on-request; brew list --cask; } | sed 's|.*/||' | sort -u |
+  extras=$(printf "%s\n" "$installed" | sed 's|.*/||' | sort -u |
     comm -23 - <(printf '%s\n' "$listed") | join_lines)
   if [[ -z $extras ]]; then
     ok "Nothing installed outside the Brewfile"
@@ -391,8 +409,13 @@ check_packages() {
 
 # Piped from curl: fetch the repo, then run its copy of this script.
 if [[ ! -f ${BASH_SOURCE[0]} ]]; then
-  require_admin
   dir="${ALUMINIUM_DIR:-$HOME/aluminium}"
+  # --check changes nothing, so it skips the installs below.
+  if [[ " $* " == *" --check "* ]]; then
+    [[ -e $dir/.git ]] || { echo "Nothing to check: no repo at $dir" >&2; exit 1; }
+    exec "$dir/bootstrap" "$@"
+  fi
+  require_admin
   say "xcode"
   step_xcode
   if [[ ! -e $dir/.git ]]; then
@@ -408,7 +431,11 @@ fi
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 load_brew || true
 
-if [[ $1 == --check ]]; then
+if [[ " $* " == *" --check "* ]]; then
+  if [[ $# -ne 1 ]]; then
+    echo "--check runs every check; it takes no steps." >&2
+    exit 1
+  fi
   say "links";    check_links
   say "repo";     check_repo
   say "packages"; check_packages
